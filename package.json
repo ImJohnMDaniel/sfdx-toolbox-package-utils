@@ -1,0 +1,76 @@
+{
+  "name": "@dx-cli-toolbox/sfdx-toolbox-package-utils",
+  "description": "Utilities to better manage SalesforceDX Packages",
+  "version": "0.1.0",
+  "author": "John M. Daniel @ImJohnMDaniel",
+  "bugs": "https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/issues",
+  "dependencies": {
+    "@oclif/command": "^1.5.19",
+    "@oclif/config": "^1.13.3",
+    "@oclif/errors": "^1.2.2",
+    "@rauschma/stringio": "^1.4.0",
+    "@salesforce/command": "^2.1.4",
+    "@salesforce/core": "^2.1.6",
+    "fs-extra": "^8.1.0",
+    "inquirer": "^7.0.3",
+    "intercept-stdout": "^0.1.2",
+    "salesforce-alm": "^47.13.0",
+    "tslib": "^1.10.0"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "^1.22.2",
+    "@oclif/plugin-help": "^2.2.3",
+    "@oclif/test": "^1.2.5",
+    "@salesforce/dev-config": "^1.5.0",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^13.1.7",
+    "chai": "^4.2.0",
+    "globby": "^11.0.0",
+    "mocha": "^7.0.0",
+    "nyc": "^15.0.0",
+    "sinon": "^8.1.0",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.4"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/lib",
+    "/messages",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "homepage": "https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils",
+  "keywords": [
+    "sfdx-plugin"
+  ],
+  "license": "MIT",
+  "oclif": {
+    "commands": "./lib/commands",
+    "topics": {
+      "toolbox": {
+        "description": "Commands focused on management of SalesforceDX projects"
+      },
+      "toolbox:package": {
+        "description": "Commands focused on management of SalesforceDX package dependencies"
+      },
+      "toolbox:package:dependencies": {
+        "description": "Commands focused on management of SalesforceDX package dependencies"
+      }
+    },
+    "bin": "sfdx",
+    "devPlugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "ImJohnMDaniel/sfdx-toolbox-package-utils",
+  "scripts": {
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "tslint -p test -t stylish",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif-dev readme && git add README.md"
+  }
+}

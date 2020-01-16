@@ -1,0 +1,3 @@
+sfdx force:org:delete -p -u toolboxpu1
+sfdx force:org:create -a toolboxpu1 -f config/project-scratch-def.json -n -s -w 20
+# bin/run toolbox:package:dependencies:install -w 120 -r 

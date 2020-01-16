@@ -1,0 +1,12 @@
+{
+    "commandDescription": "Manage the sfdx project dependencies",
+    "flagBranchDescription": "the package version’s branch",
+    "flagUpdateToReleasedDescription": "when used, all dependencies will be updated to latest, released package version",
+    "commandSpinner": "Managing the dependencies...",
+    "examplesDescription": "$ sfdx toolbox:package:dependencies:manage --targetusername myOrg@example.com --targetdevhubusername devhub@org.com",
+    "messagePackageDependenciesFound": "Package dependencies found for package directory %s",
+    "messagePackageDependencyNotManagedByDevHub": "The dependency '%s' is not managed by this Dev Hub.  Moving on to next dependency.",
+    "messageReviewingOptionsForPackageDependency": "Preparing options from Dev Hub for dependency '%s'",
+    "messageWhichVersionOfPackage": "Which version of package '%s' should be used"
+}
+  

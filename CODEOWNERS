@@ -1,0 +1,8 @@
+# Code Owners file
+#
+# Reference GitHub CODEOWNERS documentation here -- https://help.github.com/en/articles/about-code-owners
+#
+# Repository Global Owners
+* @ImJohnMDaniel
+
+CODEOWNERS @ImJohnMDaniel
