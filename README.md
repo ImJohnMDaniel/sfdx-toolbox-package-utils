@@ -34,15 +34,15 @@ sfdx plugins:link rstk-sfdx-package-utils
 ```
 # Commands
 <!-- commands -->
-* [`sfdx rstk:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-rstkpackagedependenciesinstall--k-string--b-string--w-number--p---dryrun--s-allusersadminsonly---noprecheck--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx toolbox:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesinstall--k-string--b-string--w-number--p---dryrun--s-allusersadminsonly---noprecheck--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `sfdx rstk:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx toolbox:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Install dependent packages for a sfdx project
 
 ```
 USAGE
-  $ sfdx rstk:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s 
+  $ sfdx toolbox:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s 
   AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
@@ -88,8 +88,8 @@ OPTIONS
       installed.
 
 EXAMPLE
-  $ rstk:package:dependencies:install -u MyScratchOrg -v MyDevHub -k "1:MyPackage1Key 2: 3:MyPackage3Key" -b "DEV"
+  $ toolbox:package:dependencies:install -u MyScratchOrg -v MyDevHub -k "1:MyPackage1Key 2: 3:MyPackage3Key" -b "DEV"
 ```
 
-_See code: [src/commands/rstk/package/dependencies/install.ts](https://github.com/RootstockMFG/rstk-sfdx-package-utils/blob/v0.1.12/src/commands/rstk/package/dependencies/install.ts)_
+_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.1.0/src/commands/toolbox/package/dependencies/install.ts)_
 <!-- commandsstop -->
