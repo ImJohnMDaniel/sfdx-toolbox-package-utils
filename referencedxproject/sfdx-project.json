@@ -6,6 +6,13 @@
             "dependencies": [
                 {
                     "package": "referencePackageA@0.1.0.1"
+                },
+                {
+                    "package": "x103.framework",
+                    "versionNumber": "0.1.0-LATEST"
+                },
+                {
+                    "package": "x103.framework-globals@0.1.0.1"
                 }
             ]
         },
