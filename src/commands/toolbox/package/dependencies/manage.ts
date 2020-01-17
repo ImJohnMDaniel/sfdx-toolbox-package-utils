@@ -76,7 +76,7 @@ export default class Manage extends SfdxCommand {
               choices: dependencyPackageChoices,
               pageSize: 4
             }]);
-            // console.log(packageVersionSelectionResponses);
+            console.log(packageVersionSelectionResponses);
             this.ux.log('');
             this.ux.log(`${dependencyPackageDisplayName} version selected: ${packageVersionSelectionResponses.version}`);
 
@@ -166,11 +166,11 @@ export default class Manage extends SfdxCommand {
 
     // this.ux.log( messages.getMessage('commandSuccess', [this.org.getOrgId()]) );
 
-// TODO -- undo this
-    // await evaluateOptions();
+    await evaluateOptions();
 
-    // console.log('************************************************************************************************');
-    // console.log(packageDependencyChangeSet);
+    console.log('************************************************************************************************');
+    console.log('packageDependencyChangeSet');
+    console.log(packageDependencyChangeSet);
     console.log('************************************************************************************************');
     // const updatePackageDependencyList = async () => {
     //   await this.asyncForEach(packageDependencyChangeSet, async (element) => {

@@ -115,7 +115,9 @@ export class DevHubDependencies {
 
     private createAlias(packageVersion: DevHubPackageVersion ): string {
         // console.log(packageVersion);
-        return this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id).Name + '@'
+        // console.log(this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id));
+        return (this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id).NamespacePrefix ? (this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id).NamespacePrefix + '.') : '')
+                    + this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id).Name + '@'
                     + this.createVersionAliasSegment(packageVersion);
     }
 
