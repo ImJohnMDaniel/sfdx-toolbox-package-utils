@@ -1,6 +1,7 @@
 import { core } from '@salesforce/command';
 import { AnyJson, JsonArray, JsonMap } from '@salesforce/ts-types';
 import * as _ from 'lodash';
+import { ProjectDependencyChange } from '../types/project_dependency_change';
 import { ProjectPackageDirectoryDependency } from '../types/project_package_directory_dependency';
 
 /*
@@ -17,7 +18,6 @@ export class SfdxProjects {
     private sfdxProjectJson: core.SfdxProjectJson;
     // private hubOrg: Org;
     // private ux: UX;
-    private currentPackageDependency: ProjectPackageDirectoryDependency;
 
     private constructor( sfdxProjectJson: core.SfdxProjectJson ) {
         this.sfdxProjectJson = sfdxProjectJson;
@@ -34,18 +34,18 @@ export class SfdxProjects {
 
     // }
 
-    public forPackageDependency(packageDependency: ProjectPackageDirectoryDependency): SfdxProjects {
-        this.currentPackageDependency = packageDependency;
-        return this;
-    }
-
-    public changeToPackageVersion() {
+    public changeToPackageVersion( dependencyChange: ProjectDependencyChange ) {
         // console.log(this.sfdxProjectJson.getContents());
-        this.sfdxProjectJson.unset('stuff');
+
+        // this.currentPackageDependency = packageDependency;
+
+        // this.sfdxProjectJson.unset('stuff');
+
         // const packageDirectories = this.sfdxProjectJson.get('packageDirectories');
         // const packageAliases = this.sfdxProjectJson.get('packageAliases');
         // console.log(this.sfdxProjectJson.getContents());
         console.log('************************************************************************************************');
+        console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
         // console.log(packageDirectories);
         // console.log(packageAliases);
         // console.log(this.getAliases());

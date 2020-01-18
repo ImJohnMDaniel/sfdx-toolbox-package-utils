@@ -102,8 +102,8 @@ export class DevHubDependencies {
         // console.log('knowsAboutThisDependency starts');
         // console.log(this.currentPackageDependency);
         // console.log('_________________________');
-        const subscriberPackageVersionId = this.currentPackageDependency.getSubscriberPackageVersionId() 
-                                                ? this.currentPackageDependency.getSubscriberPackageVersionId() 
+        const subscriberPackageVersionId = this.currentPackageDependency.getSubscriberPackageVersionId()
+                                                ? this.currentPackageDependency.getSubscriberPackageVersionId()
                                                 : this.resolvePackageVersionId(this.currentPackageDependency).getSubscriberPackageVersionId();
         return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId)
             || this.devHubPackageInfosBySubscriberPackageMap.has(this.currentPackageDependency.getPackage2Id());
@@ -111,6 +111,12 @@ export class DevHubDependencies {
 
     public findAliasForSubscriberPackageVersionId(subscriberPackageVersionId: string): string {
         return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId) ? this.createAlias( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId) ) : undefined;
+    }
+
+    public findDependencyBySubscriberPackageVersionId(subscriberPackageVersionId: string): DevHubPackageVersion {
+        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId)
+                        ? this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId)
+                        : undefined;
     }
 
     private createAlias(packageVersion: DevHubPackageVersion ): string {

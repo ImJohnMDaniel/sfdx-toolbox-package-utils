@@ -3,6 +3,7 @@ import * as inquirer from 'inquirer';
 import * as _ from 'lodash';
 import { DevHubDependencies } from '../../../../shared/devHub';
 import { SfdxProjects } from '../../../../shared/sfdxproject';
+import { ProjectDependencyChange } from '../../../../types/project_dependency_change';
 import { ProjectPackageDirectoryDependency } from '../../../../types/project_package_directory_dependency';
 
 // Initialize Messages with the current plugin directory
@@ -86,16 +87,32 @@ export default class Manage extends SfdxCommand {
               theOriginalVersionAlias = theSfdxProject.findAliasForProjectDependency(element);
             }
 
-            const packageDependencyChange = {
-              package: element.getPackage2Id(),
-              originalVersion: element.getVersionNumber(),
-              originalVersionSubscriberPackageVersionId: element.getSubscriberPackageVersionId(),
-              newVersionSubscriberPackageVersionId: packageVersionSelectionResponses.version,
-              originalVersionAlias: theOriginalVersionAlias,
-              newVersionAlias: theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version)
-            };
+// TODO: Need to change the transport object here. Instead of a custom mapping, it should be a custom mapping object with the following setup:
+//    * the original {element:ProjectPackageDirectoryDependency}
+//    * the new version {newVersion:ProjectPackageDirectoryDependency}
+//    * the original version alias
+//    * new version alias
+//    The custom mapping object will have two key value pairs and the structure will be
+//    *   originalVersion => custom object contains alias and ProjectPackageDirectoryDependency
+//    *   newVersion => custom object contains alias and ProjectPackageDirectoryDependency
+//  Need to setup a ProjectPackageDirectoryDependency from the element
+//    The selection tool will find the originalVersion and replace it with newVersion
 
-            packageDependencyChangeSet.push(packageDependencyChange);
+            const aProjectDependencyChange = new ProjectDependencyChange()
+                                                        .setOldVersion( element, theOriginalVersionAlias )
+                                                        .setNewVersion( theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version)
+                                                                      , theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version));
+
+            // const packageDependencyChange = {
+            //   package: element.getPackage2Id(),
+            //   originalVersion: element.getVersionNumber(),
+            //   originalVersionSubscriberPackageVersionId: element.getSubscriberPackageVersionId(),
+            //   newVersionSubscriberPackageVersionId: packageVersionSelectionResponses.version,
+            //   originalVersionAlias: theOriginalVersionAlias,
+            //   newVersionAlias: theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version)
+            // };
+
+            packageDependencyChangeSet.push(aProjectDependencyChange);
           } else {
             this.ux.log('No alternate choices found for ' + dependencyDisplayName);
           }
@@ -172,15 +189,13 @@ export default class Manage extends SfdxCommand {
     console.log('packageDependencyChangeSet');
     console.log(packageDependencyChangeSet);
     console.log('************************************************************************************************');
-    // const updatePackageDependencyList = async () => {
-    //   await this.asyncForEach(packageDependencyChangeSet, async (element) => {
-    //     const blue: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
-    //     console.log(theSfdxProject.forPackageDependency().changeToPackageVersion());
-    //   });
-    // }
+    const updatePackageDependencyList = async () => {
+      await this.asyncForEach(packageDependencyChangeSet, async (element: ProjectDependencyChange) => {
+        theSfdxProject.changeToPackageVersion( element );
+      });
+    };
 
-    // await updatePackageDependencyList();
-    theSfdxProject.changeToPackageVersion();
+    await updatePackageDependencyList();
 
     console.log('************************************************************************************************');
 
