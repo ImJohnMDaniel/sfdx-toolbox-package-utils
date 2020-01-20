@@ -35,14 +35,24 @@ export class SfdxProjects {
     // }
 
     public changeToPackageVersion( dependencyChange: ProjectDependencyChange ) {
-        // console.log(this.sfdxProjectJson.getContents());
 
         // this.currentPackageDependency = packageDependency;
 
-        // this.sfdxProjectJson.unset('stuff');
+        console.log('************************************************************************************************');
+        console.log(this.sfdxProjectJson);
+        console.log('************************************************************************************************');
+        console.log(this.sfdxProjectJson.getContents());
+        // console.log('************************************************************************************************');
+        // console.log(this.sfdxProjectJson.setContentsFromObject());
 
-        // const packageDirectories = this.sfdxProjectJson.get('packageDirectories');
-        // const packageAliases = this.sfdxProjectJson.get('packageAliases');
+        this.sfdxProjectJson.unset( dependencyChange.getOldVersionAlias() );
+        // this.sfdxProjectJson.write();
+        console.log('************************************************************************************************');
+        console.log(this.sfdxProjectJson);
+
+        // const packageDirectories: ConfigValue = this.sfdxProjectJson.get('packageDirectories');
+        // const packageAliases: ConfigValue = this.sfdxProjectJson.get('packageAliases');
+
         // console.log(this.sfdxProjectJson.getContents());
         console.log('************************************************************************************************');
         console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );

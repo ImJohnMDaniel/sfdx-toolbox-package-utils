@@ -185,10 +185,9 @@ export default class Manage extends SfdxCommand {
 
     await evaluateOptions();
 
-    console.log('************************************************************************************************');
-    console.log('packageDependencyChangeSet');
-    console.log(packageDependencyChangeSet);
-    console.log('************************************************************************************************');
+    // console.log('************************************************************************************************');
+    // console.log('packageDependencyChangeSet');
+    // console.log('************************************************************************************************');
     const updatePackageDependencyList = async () => {
       await this.asyncForEach(packageDependencyChangeSet, async (element: ProjectDependencyChange) => {
         theSfdxProject.changeToPackageVersion( element );
@@ -197,7 +196,7 @@ export default class Manage extends SfdxCommand {
 
     await updatePackageDependencyList();
 
-    console.log('************************************************************************************************');
+    // console.log('************************************************************************************************');
 
     return;
   }
