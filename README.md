@@ -1,4 +1,4 @@
-rstk-sfdx-package-utils
+@dx-cli-toolbox/sfdx-toolbox-package-utils
 =======================
 
 Utilities to better manage SalesforceDX Packages
@@ -14,7 +14,7 @@ Utilities to better manage SalesforceDX Packages
 ### **Install as a SalesforceDX Plugin**
 
 ```  
-sfdx plugins:install rstk-sfdx-package-utils
+sfdx plugins:install @dx-cli-toolbox/sfdx-toolbox-package-utils
 ```
 You will be prompted to confirm that you want to install an unsigned plugin. Choose "yes"
 ```  
@@ -26,11 +26,11 @@ To whitelist this plugin, [add an entry for it in $HOME/.config/sfdx/unsignedPlu
 ### **Install from source**
 1. Clone the repository
 ```  
-git clone https://github.com/rootstockmfg/rstk-sfdx-package-utils.git
+git clone https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils.git
 ```
 2. Link the plugin:
 ```
-sfdx plugins:link rstk-sfdx-package-utils
+sfdx plugins:link .
 ```
 # Commands
 <!-- commands -->
@@ -91,5 +91,5 @@ EXAMPLE
   $ toolbox:package:dependencies:install -u MyScratchOrg -v MyDevHub -k "1:MyPackage1Key 2: 3:MyPackage3Key" -b "DEV"
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.1.0/src/commands/toolbox/package/dependencies/install.ts)_
+_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.1.1/src/commands/toolbox/package/dependencies/install.ts)_
 <!-- commandsstop -->
