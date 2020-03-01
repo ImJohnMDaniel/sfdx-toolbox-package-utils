@@ -1,4 +1,4 @@
-rstk-sfdx-package-utils
+@dx-cli-toolbox/sfdx-toolbox-package-utils
 =======================
 
 Utilities to better manage SalesforceDX Packages
@@ -14,7 +14,7 @@ Utilities to better manage SalesforceDX Packages
 ### **Install as a SalesforceDX Plugin**
 
 ```  
-sfdx plugins:install rstk-sfdx-package-utils
+sfdx plugins:install @dx-cli-toolbox/sfdx-toolbox-package-utils
 ```
 You will be prompted to confirm that you want to install an unsigned plugin. Choose "yes"
 ```  
@@ -26,27 +26,30 @@ To whitelist this plugin, [add an entry for it in $HOME/.config/sfdx/unsignedPlu
 ### **Install from source**
 1. Clone the repository
 ```  
-git clone https://github.com/rootstockmfg/rstk-sfdx-package-utils.git
+git clone https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils.git
 ```
 2. Link the plugin:
 ```
-sfdx plugins:link rstk-sfdx-package-utils
+sfdx plugins:link .
 ```
 # Commands
 <!-- commands -->
-* [`sfdx toolbox:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesinstall--k-string--b-string--w-number--p---dryrun--s-allusersadminsonly---noprecheck--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesinstall--a-allpackage--b-string---dryrun--k-string---noprecheck--p--s-allusersadminsonly--w-number--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `sfdx toolbox:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Install dependent packages for a sfdx project
 
 ```
 USAGE
-  $ sfdx toolbox:package:dependencies:install [-k <string>] [-b <string>] [-w <number>] [-p] [--dryrun] [-s 
-  AllUsers|AdminsOnly] [--noprecheck] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
+  $ sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] 
+  [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
+  -a, --apexcompile=(all|package)
+      [default: all] compile all Apex in the org and package, or only Apex in the package
+
   -b, --branch=branch
       For dependencies specified by package/versionNumber combination, you can specify the branch group of builds to work 
       from by entering the branch build name.  If not specified, the builds from NULL branch will be considered.
@@ -91,5 +94,5 @@ EXAMPLE
   $ toolbox:package:dependencies:install -u MyScratchOrg -v MyDevHub -k "1:MyPackage1Key 2: 3:MyPackage3Key" -b "DEV"
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.1.0/src/commands/toolbox/package/dependencies/install.ts)_
+_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.2.0/src/commands/toolbox/package/dependencies/install.ts)_
 <!-- commandsstop -->

@@ -24,13 +24,14 @@ export default class Install extends SfdxCommand {
   public static examples = [messages.getMessage('examplesDescription')];
 
   protected static flagsConfig = {
-    installationkeys: flags.string({ char: 'k', required: false, description: messages.getMessage('flagInstallationKeysDescription') }),
+    apexcompile: flags.enum({ char: 'a', default: 'all', required: false, description: messages.getMessage('flagApexCompileDescription'), options: ['all', 'package'] }),
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
-    wait: flags.number({ char: 'w', required: false, description: messages.getMessage('flagWaitDescription') }),
-    prompt: flags.boolean({ char: 'p', default: false, required: false, description: messages.getMessage('flagPromptDescription') }),
     dryrun: flags.boolean({ required: false, description: messages.getMessage('flagDryrunDescription') }),
-    securitytype: flags.enum({ char: 's', default: 'AdminsOnly', required: false, description: 'security access type for the installed package', options: ['AllUsers', 'AdminsOnly']}),
-    noprecheck: flags.boolean({ required: false, default: false, description: messages.getMessage('flagNoPrecheckDescription') })
+    installationkeys: flags.string({ char: 'k', required: false, description: messages.getMessage('flagInstallationKeysDescription') }),
+    noprecheck: flags.boolean({ required: false, default: false, description: messages.getMessage('flagNoPrecheckDescription') }),
+    prompt: flags.boolean({ char: 'p', default: false, required: false, description: messages.getMessage('flagPromptDescription') }),
+    securitytype: flags.enum({ char: 's', default: 'AdminsOnly', required: false, description: messages.getMessage('flagSecuritytypeDescription'), options: ['AllUsers', 'AdminsOnly']}),
+    wait: flags.number({ char: 'w', required: false, description: messages.getMessage('flagWaitDescription') })
   };
 
   // Comment this out if your command does not require an org username
@@ -199,6 +200,12 @@ export default class Install extends SfdxCommand {
         if (!this.flags.prompt) {
           // add the "--noprompt" flag by default as long as this command's "prompt" flag is false.
           args.push('--noprompt');
+        }
+
+        // APEXCOMPILE
+        if (this.flags.apexcompile) {
+          args.push('--apexcompile');
+          args.push(`${this.flags.apexcompile}`);
         }
 
         // JSON
