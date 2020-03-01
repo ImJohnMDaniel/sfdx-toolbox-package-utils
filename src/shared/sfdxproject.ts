@@ -17,7 +17,7 @@ export class SfdxProjects {
     private sfdxProjectJson: core.SfdxProjectJson;
     // private hubOrg: Org;
     // private ux: UX;
-    private currentPackageDependency: ProjectPackageDirectoryDependency;
+    // private currentPackageDependency: ProjectPackageDirectoryDependency;
 
     private constructor( sfdxProjectJson: core.SfdxProjectJson ) {
         this.sfdxProjectJson = sfdxProjectJson;
@@ -35,7 +35,7 @@ export class SfdxProjects {
     // }
 
     public forPackageDependency(packageDependency: ProjectPackageDirectoryDependency): SfdxProjects {
-        this.currentPackageDependency = packageDependency;
+        // this.currentPackageDependency = packageDependency;
         return this;
     }
 
