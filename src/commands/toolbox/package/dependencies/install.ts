@@ -82,7 +82,7 @@ export default class Install extends SfdxCommand {
           packageInfo.versionNumber = versionNumber;
 
           //  if versionNumber is undefined and dependentPackage is a packageAlias, then the alias should return the package version 04t id
-          //  if that is the case, then there is no need to get teh debHubServier to resolve the package version id
+          //  if that is the case, then there is no need to get the devHubServier to resolve the package version id
           // is the dependentPackage an alias?
           const matched = aliasKeys.find(item => item === dependentPackage);
           if (matched) {

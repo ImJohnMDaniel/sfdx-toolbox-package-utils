@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { PackageInstalledListCommand } from 'salesforce-alm/dist/commands/force/package/installed/list';
 import { PackageListCommand } from 'salesforce-alm/dist/commands/force/package/list';
 import { PackageVersionListCommand } from 'salesforce-alm/dist/commands/force/package/version/list';
-import { DevHubPackage } from '../../types/debhub_package';
+import { DevHubPackage } from '../../types/devhub_package';
 import { DevHubPackageVersion } from '../../types/devhub_package_version';
 import { SubscriberInstalledPackageVersion } from '../../types/subscriber_installed_package_version';
 

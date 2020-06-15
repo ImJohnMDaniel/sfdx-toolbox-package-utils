@@ -1,6 +1,6 @@
 import { UX } from '@salesforce/command';
 import { Org } from '@salesforce/core';
-import { DevHubPackage } from '../types/debhub_package';
+import { DevHubPackage } from '../types/devhub_package';
 import { DevHubPackageVersion } from '../types/devhub_package_version';
 import { InquirerOption } from '../types/inquirer_option';
 import { ProjectPackageDirectoryDependency } from '../types/project_package_directory_dependency';
