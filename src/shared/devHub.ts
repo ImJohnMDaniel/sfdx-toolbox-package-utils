@@ -24,6 +24,7 @@ export class DevHubDependencies {
     private currentPackageDependency: ProjectPackageDirectoryDependency;
     //                                                      PACKAGE2ID  BRANCH      MAJOR       MINOR       PATCH       BUILD
     private devHubPackageVersionInfosByPackageAndBranchMap: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>;
+    private devHubPackageVersionInfosReleasedByPackageAndBranchMap: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>;
     private devHubPackageVersionInfosBySubscriberPackageVersionMap: Map<string, DevHubPackageVersion>;
     private devHubPackageInfosBySubscriberPackageMap: Map<string, DevHubPackage>;
 
@@ -79,6 +80,9 @@ export class DevHubDependencies {
         this.logger(options.length);
         this.findLatestCurrentBranchBuilderVersion(options);
         this.logger('mark 2D');
+        this.logger(options.length);
+        this.findLatestBuildReleased(options);
+        this.logger('mark 2E');
         this.logger(options.length);
 
         // add the current version to allow for no change
@@ -142,12 +146,12 @@ export class DevHubDependencies {
     private findLaterBuildSameMajorMinorVersion(options: InquirerOption[]) {
         // console.log('mark 2A1 -- findLaterBuildSameMajorMinorVersion');
         // const currentBuildBlock = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
-        const currentBuildBlock = this.findBlock(CHUNK_LEVEL.MINOR, this.currentBranch);
+        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, this.currentBranch);
         // console.log('mark 2A2');
 
         if (currentBuildBlock) {
             // console.log('mark 2A3');
-            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version', this.currentBranch));
+            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on \'' + this.currentBranch + '\' branch', this.currentBranch));
         } else {
             this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
         }
@@ -156,10 +160,10 @@ export class DevHubDependencies {
 
     private findLatestMainBranchBuildVersion(options: InquirerOption[]) {
         // const currentMajorBuildBlock = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get('');
-        const currentBuildBlock = this.findBlock(CHUNK_LEVEL.MAJOR, '');
+        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
 
         if (currentBuildBlock) {
-            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on master branch', undefined));
+            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on main build branch', undefined));
         } else {
             this.ux.log('No option found for latest build on the main build branch');
         }
@@ -167,13 +171,26 @@ export class DevHubDependencies {
 
     private findLatestCurrentBranchBuilderVersion(options: InquirerOption[]) {
         // const currentMajorBuildBlock = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()).get(this.currentPackageDependency.getPatchVersionNumber());
-        const currentBuildBlock = this.findBlock(CHUNK_LEVEL.PATCH, this.currentBranch);
+        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
 
         if (currentBuildBlock) {
             options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on \'' + this.currentBranch + '\' branch', this.currentBranch));
         } else {
             this.ux.log('No option found for latest build on branch : ' + this.currentBranch);
         }
+    }
+
+    private findLatestBuildReleased(options: InquirerOption[]) {
+        // this.devHubPackageVersionInfosReleasedByPackageAndBranchMap
+        // createOption(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
+        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosReleasedByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
+        // console.log('________________________________________________________________________');
+        // console.log(currentBuildBlock);
+        // console.log('________________________________________________________________________');
+        // console.log(currentBuildBlock.get(1));
+        // console.log('________________________________________________________________________');
+
+        options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest released version on main build branch', undefined));
     }
 
     private resolvePackageVersionId(packageDependency: ProjectPackageDirectoryDependency): ProjectPackageDirectoryDependency {
@@ -244,35 +261,35 @@ export class DevHubDependencies {
     }
 
     // tslint:disable-next-line: no-any
-    private findBlock(chunkLevel: CHUNK_LEVEL, branchToEvalute: string): Map<number, any> {
-        // this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
+    private findBlock(packageVersionMapToInspect: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>, chunkLevel: CHUNK_LEVEL, branchToEvalute: string): Map<number, any> {
+        // packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
         // console.log('mark find 1');
         // console.log(this.currentPackageDependency);
         // console.log(this.currentPackageDependency.getPackage2Id());
         // console.log(branchToEvalute);
-        // console.log(this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()));
+        // console.log(packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()));
         let output;
         if (chunkLevel >= CHUNK_LEVEL.MAJOR
-            && this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute) !== undefined) {
+            && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute) !== undefined) {
             // console.log('mark find 2');
             // console.log(branchToEvalute);
             // console.log(this.currentPackageDependency.getMajorVersionNumber());
-            // console.log(this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute));
+            // console.log(packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute));
 
             if (chunkLevel >= CHUNK_LEVEL.MINOR
-                && this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()) !== undefined) {
+                && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()) !== undefined) {
                     // console.log('mark find 3');
                 if (chunkLevel >= CHUNK_LEVEL.PATCH
-                    && this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()) !== undefined) {
+                    && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()) !== undefined) {
                         // console.log('mark find 4');
-                        output = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()).get(this.currentPackageDependency.getPatchVersionNumber());
+                        output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()).get(this.currentPackageDependency.getPatchVersionNumber());
                 } else {
                     // console.log('mark find 7');
-                    output = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
+                    output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
                 }
             } else {
                 // console.log('mark find 8');
-                output = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber());
+                output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber());
             }
             // console.log('mark find 9');
         }
@@ -314,40 +331,48 @@ export class DevHubDependencies {
     private initializeDevHubPackageVersionInfosByPackageAndBranchMap() {
         // console.log('initializeDevHubPackageVersionInfosByPackageAndBranchMap method called');
         this.devHubPackageVersionInfosByPackageAndBranchMap = new Map();
+        this.devHubPackageVersionInfosReleasedByPackageAndBranchMap = new Map();
 
         this.allPackageVersionInfosFromDevHub.forEach((element: DevHubPackageVersion) => {
             // add entry for Package2Id
-            // console.log('element.Package2Id == ' + element.Package2Id);
-            if (!this.devHubPackageVersionInfosByPackageAndBranchMap.has(element.Package2Id)) {
-                this.devHubPackageVersionInfosByPackageAndBranchMap.set(element.Package2Id, new Map());
-            }
-
-            const currentBranch = element.Branch ? element.Branch : '';
-
-            // add entry for Branch
-            if (!this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).has(currentBranch)) {
-                // console.log('Adding branch == `' + currentBranch + '`');
-                this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).set(currentBranch, new Map());
-            }
-            // add entry for MajorVersion
-            if (!this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).has(element.MajorVersion)) {
-                this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).set(element.MajorVersion, new Map());
-            }
-            // add entry for MinorVersion
-            if (!this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).has(element.MinorVersion)) {
-                this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).set(element.MinorVersion, new Map());
-            }
-            // add entry for PatchVersion
-            if (!this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).has(element.PatchVersion)) {
-                this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).set(element.PatchVersion, new Map());
-            }
-            // add entry for BuildNumber
-            if (!this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).get(element.PatchVersion).has(element.BuildNumber)) {
-                // add the DevHubPackageVersion to that spot
-                this.devHubPackageVersionInfosByPackageAndBranchMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).get(element.PatchVersion).set(element.BuildNumber, element);
+            this.sortElementInMap(this.devHubPackageVersionInfosByPackageAndBranchMap, element);
+            if ( element.IsReleased ) {
+                this.sortElementInMap(this.devHubPackageVersionInfosReleasedByPackageAndBranchMap, element);
             }
         });
         // console.log('initializeDevHubPackageVersionInfosByPackageAndBranchMap method completed');
+    }
+
+    private sortElementInMap( theMap: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>, element: DevHubPackageVersion ) {
+        // console.log('element.Package2Id == ' + element.Package2Id);
+        if (!theMap.has(element.Package2Id)) {
+            theMap.set(element.Package2Id, new Map());
+        }
+
+        const currentBranch = element.Branch ? element.Branch : '';
+
+        // add entry for Branch
+        if (!theMap.get(element.Package2Id).has(currentBranch)) {
+            // console.log('Adding branch == `' + currentBranch + '`');
+            theMap.get(element.Package2Id).set(currentBranch, new Map());
+        }
+        // add entry for MajorVersion
+        if (!theMap.get(element.Package2Id).get(currentBranch).has(element.MajorVersion)) {
+            theMap.get(element.Package2Id).get(currentBranch).set(element.MajorVersion, new Map());
+        }
+        // add entry for MinorVersion
+        if (!theMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).has(element.MinorVersion)) {
+            theMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).set(element.MinorVersion, new Map());
+        }
+        // add entry for PatchVersion
+        if (!theMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).has(element.PatchVersion)) {
+            theMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).set(element.PatchVersion, new Map());
+        }
+        // add entry for BuildNumber
+        if (!theMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).get(element.PatchVersion).has(element.BuildNumber)) {
+            // add the DevHubPackageVersion to that spot
+            theMap.get(element.Package2Id).get(currentBranch).get(element.MajorVersion).get(element.MinorVersion).get(element.PatchVersion).set(element.BuildNumber, element);
+        }
     }
 
     // tslint:disable-next-line: no-any
