@@ -20,7 +20,8 @@ export default class Manage extends SfdxCommand {
 
   protected static flagsConfig = {
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
-    updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription') })
+    updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription') }),
+    updatetosnapshot: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToSnapshotDescription') })
   };
 
   // Comment this out if your command does not require an org username
@@ -75,9 +76,9 @@ export default class Manage extends SfdxCommand {
               message: messages.getMessage('messageWhichVersionOfPackage', [dependencyPackageDisplayName]),
               type: 'list',
               choices: dependencyPackageChoices,
-              pageSize: 4
+              pageSize: 8
             }]);
-            console.log(packageVersionSelectionResponses);
+            // console.log(packageVersionSelectionResponses);
             this.ux.log('');
             this.ux.log(`${dependencyPackageDisplayName} version selected: ${packageVersionSelectionResponses.version}`);
 
