@@ -38,17 +38,22 @@ export class SfdxProjects {
 
         // this.currentPackageDependency = packageDependency;
 
-        console.log('************************************************************************************************');
-        console.log(this.sfdxProjectJson);
+        // console.log('************************************************************************************************');
+        // console.log(this.sfdxProjectJson);
         console.log('************************************************************************************************');
         console.log(this.sfdxProjectJson.getContents());
-        // console.log('************************************************************************************************');
+        console.log('************************************************************************************************');
+        console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
+        console.log('************************************************************************************************');
         // console.log(this.sfdxProjectJson.setContentsFromObject());
 
-        this.sfdxProjectJson.unset( dependencyChange.getOldVersionAlias() );
+        const bolUnsetResult = this.sfdxProjectJson.unset( dependencyChange.getOldVersionAlias() );
+        console.log(`bolUnsetResult == ${bolUnsetResult}`);
         // this.sfdxProjectJson.write();
         console.log('************************************************************************************************');
-        console.log(this.sfdxProjectJson);
+        console.log(this.sfdxProjectJson.getContents().packageDirectories);
+        console.log('************************************************************************************************');
+        console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
 
         // const packageDirectories: ConfigValue = this.sfdxProjectJson.get('packageDirectories');
         // const packageAliases: ConfigValue = this.sfdxProjectJson.get('packageAliases');
