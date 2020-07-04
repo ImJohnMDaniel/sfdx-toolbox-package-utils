@@ -144,22 +144,18 @@ export class DevHubDependencies {
     }
 
     private findLaterBuildSameMajorMinorVersion(options: InquirerOption[]) {
-        // console.log('mark 2A1 -- findLaterBuildSameMajorMinorVersion');
-        // const currentBuildBlock = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
-        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, this.currentBranch);
-        // console.log('mark 2A2');
+        if ( this.currentBranch ) {
+            const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, this.currentBranch);
 
-        if (currentBuildBlock) {
-            // console.log('mark 2A3');
-            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on \'' + this.currentBranch + '\' branch', this.currentBranch));
-        } else {
-            this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
+            if (currentBuildBlock) {
+                options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on \'' + this.currentBranch + '\' branch', this.currentBranch));
+            } else {
+                this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
+            }
         }
-        // console.log('mark 2A9');
     }
 
     private findLatestMainBranchBuildVersion(options: InquirerOption[]) {
-        // const currentMajorBuildBlock = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get('');
         const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
 
         if (currentBuildBlock) {
@@ -170,27 +166,25 @@ export class DevHubDependencies {
     }
 
     private findLatestCurrentBranchBuilderVersion(options: InquirerOption[]) {
-        // const currentMajorBuildBlock = this.devHubPackageVersionInfosByPackageAndBranchMap.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()).get(this.currentPackageDependency.getPatchVersionNumber());
-        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
+        if ( this.currentBranch ) {
+            const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
 
-        if (currentBuildBlock) {
-            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on \'' + this.currentBranch + '\' branch', this.currentBranch));
-        } else {
-            this.ux.log('No option found for latest build on branch : ' + this.currentBranch);
+            if (currentBuildBlock) {
+                options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on \'' + this.currentBranch + '\' branch', this.currentBranch));
+            } else {
+                this.ux.log('No option found for latest build on branch : ' + this.currentBranch);
+            }
         }
     }
 
     private findLatestBuildReleased(options: InquirerOption[]) {
-        // this.devHubPackageVersionInfosReleasedByPackageAndBranchMap
-        // createOption(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
         const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosReleasedByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
-        // console.log('________________________________________________________________________');
-        // console.log(currentBuildBlock);
-        // console.log('________________________________________________________________________');
-        // console.log(currentBuildBlock.get(1));
-        // console.log('________________________________________________________________________');
 
-        options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest released version on main build branch', undefined));
+        if (currentBuildBlock) {
+            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest released version on main build branch', undefined));
+        } else {
+            this.ux.log('No option found for released version build on main build branch');
+        }
     }
 
     private resolvePackageVersionId(packageDependency: ProjectPackageDirectoryDependency): ProjectPackageDirectoryDependency {
@@ -269,29 +263,31 @@ export class DevHubDependencies {
         // console.log(branchToEvalute);
         // console.log(packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()));
         let output;
-        if (chunkLevel >= CHUNK_LEVEL.MAJOR
-            && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute) !== undefined) {
-            // console.log('mark find 2');
-            // console.log(branchToEvalute);
-            // console.log(this.currentPackageDependency.getMajorVersionNumber());
-            // console.log(packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute));
+        if ( packageVersionMapToInspect.has(this.currentPackageDependency.getPackage2Id()) ) {
+            if (chunkLevel >= CHUNK_LEVEL.MAJOR
+                && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute) !== undefined) {
+                // console.log('mark find 2');
+                // console.log(branchToEvalute);
+                // console.log(this.currentPackageDependency.getMajorVersionNumber());
+                // console.log(packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute));
 
-            if (chunkLevel >= CHUNK_LEVEL.MINOR
-                && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()) !== undefined) {
-                    // console.log('mark find 3');
-                if (chunkLevel >= CHUNK_LEVEL.PATCH
-                    && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()) !== undefined) {
-                        // console.log('mark find 4');
-                        output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()).get(this.currentPackageDependency.getPatchVersionNumber());
+                if (chunkLevel >= CHUNK_LEVEL.MINOR
+                    && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()) !== undefined) {
+                        // console.log('mark find 3');
+                    if (chunkLevel >= CHUNK_LEVEL.PATCH
+                        && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()) !== undefined) {
+                            // console.log('mark find 4');
+                            output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()).get(this.currentPackageDependency.getPatchVersionNumber());
+                    } else {
+                        // console.log('mark find 7');
+                        output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
+                    }
                 } else {
-                    // console.log('mark find 7');
-                    output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
+                    // console.log('mark find 8');
+                    output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber());
                 }
-            } else {
-                // console.log('mark find 8');
-                output = packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber());
+                // console.log('mark find 9');
             }
-            // console.log('mark find 9');
         }
         // console.log('mark find last');
         // console.log(output);
