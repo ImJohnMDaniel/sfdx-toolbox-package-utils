@@ -191,11 +191,15 @@ export default class Manage extends SfdxCommand {
     // console.log('************************************************************************************************');
     const updatePackageDependencyList = async () => {
       await this.asyncForEach(packageDependencyChangeSet, async (element: ProjectDependencyChange) => {
-        theSfdxProject.changeToPackageVersion( element );
+        await theSfdxProject.changeToPackageVersion( element );
       });
     };
 
     await updatePackageDependencyList();
+
+    // console.log('About to write to the sfdx-project.json file');
+    // await theSfdxProject.write();
+    // console.log('finished writing to the sfdx-project.json file');
 
     // console.log('************************************************************************************************');
 
