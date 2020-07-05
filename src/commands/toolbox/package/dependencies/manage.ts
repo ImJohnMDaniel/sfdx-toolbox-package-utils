@@ -46,100 +46,126 @@ export default class Manage extends SfdxCommand {
 
     const theDevHubDependencies = await DevHubDependencies.getInstance(this.hubOrg, this.ux);
 
-    const packageDependencyChangeSet = [];
+    // const packageDependencyChangeSet = [];
+    const packageDependencyChangeMap: Map<string, ProjectDependencyChange[]> = new Map<string, ProjectDependencyChange[]>();
 
     // Step 1D: for each dependency, prep choices
     // theSfdxProject.getProjectDependencies().forEach(async (element: ProjectPackageDirectoryDependency) => {
     const evaluateOptions = async () => {
-      await this.asyncForEach(theSfdxProject.getProjectDependencies(), async (element: ProjectPackageDirectoryDependency) => {
-        this.ux.log('');
-        // console.log(element);
-        const dependencyDisplayName = theSfdxProject.getDependencyDisplayName(element);
-        // if packageVersionId is not part of the devHubPackageVersionInfosBySubscriberPackageVersionMap
-        //  then this packageDependency is not owned by this DevHub
-        // so only take action if the packageVersionId is found or the package2Id is found
-        if (theDevHubDependencies.for(element).onBranch(this.flags.branch).knowsAboutThisDependency()) {
-          // What do I want to do with this dependency now?
-          // console.log('DevHub knows about dependency');
-          // console.log('theSfdxProject.findAlias(element.getSubscriberPackageVersionId()) == ' + theSfdxProject.findAlias(element.getSubscriberPackageVersionId()));
-          this.ux.log(messages.getMessage('messageReviewingOptionsForPackageDependency', [dependencyDisplayName]));
-          // console.log('mark 1');
-          const dependencyPackageDisplayName = theSfdxProject.getDependencyPackageDisplayName(theDevHubDependencies.getPackage2IDForCurrentDependency());
-          // console.log('mark 2');
-          const dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
-          // console.log('mark 3');
+      // console.log('Hello');
+      // console.log(theSfdxProject.getProjectDependenciesByPackageDirectoryPath().keys());
+      // // await this.asyncForEach( theSfdxProject.getProjectDependenciesByPackageDirectoryPath().keys(), (packageDirectoryPath: string) => {
+      //   console.log(packageDirectoryPath);
+      // });
+
+      // for (const [key, value] of theSfdxProject.getProjectDependenciesByPackageDirectoryPath()) {
+      //   console.log(key, value);
+      // }
+
+      // await this.asyncForEach( theSfdxProject.getProjectDependenciesByPackageDirectoryPath().keys(), async (packageDirectoryPath: string) => {
+      for (const [packageDirectoryPath, dependenciesForPackageDirectoryPath] of theSfdxProject.getProjectDependenciesByPackageDirectoryPath()) {
+        // console.log('Hello Again.... ' + packageDirectoryPath);
+        packageDependencyChangeMap.set( packageDirectoryPath, []);
+
+        // const dependenciesForPackageDirectoryPath = theSfdxProject.getProjectDependenciesByPackageDirectoryPath().get(packageDirectoryPath);
+
+        // console.log(packageDirectoryPath);
+        await this.asyncForEach(dependenciesForPackageDirectoryPath, async (element: ProjectPackageDirectoryDependency) => {
           this.ux.log('');
-          if (dependencyPackageChoices.length > 0) {
-            // tslint:disable-next-line: no-any
-            const packageVersionSelectionResponses: any = await inquirer.prompt([{
-              name: 'version',
-              message: messages.getMessage('messageWhichVersionOfPackage', [dependencyPackageDisplayName]),
-              type: 'list',
-              choices: dependencyPackageChoices,
-              pageSize: 8
-            }]);
-            // console.log(packageVersionSelectionResponses);
+          // console.log(packageDirectoryPath);
+          // console.log(element);
+          const dependencyDisplayName = theSfdxProject.getDependencyDisplayName(element);
+          // if packageVersionId is not part of the devHubPackageVersionInfosBySubscriberPackageVersionMap
+          //  then this packageDependency is not owned by this DevHub
+          // so only take action if the packageVersionId is found or the package2Id is found
+          if (theDevHubDependencies.for(element).onBranch(this.flags.branch).knowsAboutThisDependency()) {
+            // What do I want to do with this dependency now?
+            // console.log('DevHub knows about dependency');
+            // console.log('theSfdxProject.findAlias(element.getSubscriberPackageVersionId()) == ' + theSfdxProject.findAlias(element.getSubscriberPackageVersionId()));
+            this.ux.log(messages.getMessage('messageReviewingOptionsForPackageDependency', [dependencyDisplayName]));
+            // console.log('mark 1');
+            const dependencyPackageDisplayName = theSfdxProject.getDependencyPackageDisplayName(theDevHubDependencies.getPackage2IDForCurrentDependency());
+            // console.log('mark 2');
+            const dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
+            // console.log('mark 3');
             this.ux.log('');
-            this.ux.log(`${dependencyPackageDisplayName} version selected: ${packageVersionSelectionResponses.version}`);
+            if (dependencyPackageChoices.length > 0) {
+              // tslint:disable-next-line: no-any
+              const packageVersionSelectionResponses: any = await inquirer.prompt([{
+                name: 'version',
+                message: messages.getMessage('messageWhichVersionOfPackage', [dependencyPackageDisplayName]),
+                type: 'list',
+                choices: dependencyPackageChoices,
+                pageSize: 8
+              }]);
+              // console.log(packageVersionSelectionResponses);
+              this.ux.log('');
+              this.ux.log(`${dependencyPackageDisplayName} version selected: ${packageVersionSelectionResponses.version}`);
 
-            let theOriginalVersionAlias = theDevHubDependencies.getAlias() ;
+              let theOriginalVersionAlias = theDevHubDependencies.getAlias() ;
 
-            if ( !theOriginalVersionAlias ) {
-              theOriginalVersionAlias = theSfdxProject.findAliasForProjectDependency(element);
-            }
+              if ( !theOriginalVersionAlias ) {
+                theOriginalVersionAlias = theSfdxProject.findAliasForProjectDependency(element);
+              }
 
-// TODO: Need to change the transport object here. Instead of a custom mapping, it should be a custom mapping object with the following setup:
-//    * the original {element:ProjectPackageDirectoryDependency}
-//    * the new version {newVersion:ProjectPackageDirectoryDependency}
-//    * the original version alias
-//    * new version alias
-//    The custom mapping object will have two key value pairs and the structure will be
-//    *   originalVersion => custom object contains alias and ProjectPackageDirectoryDependency
-//    *   newVersion => custom object contains alias and ProjectPackageDirectoryDependency
-//  Need to setup a ProjectPackageDirectoryDependency from the element
-//    The selection tool will find the originalVersion and replace it with newVersion
+              // TODO: Need to change the transport object here. Instead of a custom mapping, it should be a custom mapping object with the following setup:
+              //    * the original {element:ProjectPackageDirectoryDependency}
+              //    * the new version {newVersion:ProjectPackageDirectoryDependency}
+              //    * the original version alias
+              //    * new version alias
+              //    The custom mapping object will have two key value pairs and the structure will be
+              //    *   originalVersion => custom object contains alias and ProjectPackageDirectoryDependency
+              //    *   newVersion => custom object contains alias and ProjectPackageDirectoryDependency
+              //  Need to setup a ProjectPackageDirectoryDependency from the element
+              //    The selection tool will find the originalVersion and replace it with newVersion
 
-            const aProjectDependencyChange = new ProjectDependencyChange()
-                                                        .setOldVersion( element, theOriginalVersionAlias )
-                                                        .setNewVersion( theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version)
+              const aProjectDependencyChange = new ProjectDependencyChange()
+                                                          .setOldVersion( element, theOriginalVersionAlias )
+                                                          .setNewVersion( theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version)
                                                                       , theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version));
 
-            // const packageDependencyChange = {
-            //   package: element.getPackage2Id(),
-            //   originalVersion: element.getVersionNumber(),
-            //   originalVersionSubscriberPackageVersionId: element.getSubscriberPackageVersionId(),
-            //   newVersionSubscriberPackageVersionId: packageVersionSelectionResponses.version,
-            //   originalVersionAlias: theOriginalVersionAlias,
-            //   newVersionAlias: theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version)
-            // };
+              // const packageDependencyChange = {
+              //   package: element.getPackage2Id(),
+              //   originalVersion: element.getVersionNumber(),
+              //   originalVersionSubscriberPackageVersionId: element.getSubscriberPackageVersionId(),
+              //   newVersionSubscriberPackageVersionId: packageVersionSelectionResponses.version,
+              //   originalVersionAlias: theOriginalVersionAlias,
+              //   newVersionAlias: theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version)
+              // };
 
-            packageDependencyChangeSet.push(aProjectDependencyChange);
+              packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
+            } else {
+              this.ux.log('No alternate choices found for ' + dependencyDisplayName);
+            }
           } else {
-            this.ux.log('No alternate choices found for ' + dependencyDisplayName);
+            // state that this dependency is not managed by the DevHub and will be by-passed.
+            this.ux.log(messages.getMessage('messagePackageDependencyNotManagedByDevHub', [dependencyDisplayName]));
           }
-        } else {
-          // state that this dependency is not managed by the DevHub and will be by-passed.
-          this.ux.log(messages.getMessage('messagePackageDependencyNotManagedByDevHub', [dependencyDisplayName]));
-        }
-        // if (devHubPackageVersionInfosBySubscriberPackageVersionMap.has(element.packageVersionId)) {
-        // console.log('taking action');
-        // The objective at this point is to organize appropriate options for this particular dependency
-        // Terms "currentPackageVersionBlock" == "Major.Minor.Patch" but not the "Build"
-        // Questions to be asked
-        // What is the currentPackageVersionBlock for this packagesDependency?
-        // const currentPackageVersion = devHubPackageVersionInfosBySubscriberPackageVersionMap.get(element.packageVersionId);
-        // const currentPackageVersionBlock = devHubPackageVersionsByPackageAndBranchMap.get(currentPackageVersion.)
-        // Is there a released version that is available on the main branch?
-        // Is there a newer version that is available on this currentPackageVersionBlock?
-        // Is there a newer Major.Minor version availble?
-        // Is there a newer Major version available?
-        // There is a distinction between "next available version" and "next avaialble released version"
-        // There is a distinction between "the base/null branch" verses the "feature branch" that is coming from Branch flag
-        // }
-        this.ux.log('');
-        this.ux.log('');
-      });
+          // if (devHubPackageVersionInfosBySubscriberPackageVersionMap.has(element.packageVersionId)) {
+          // console.log('taking action');
+          // The objective at this point is to organize appropriate options for this particular dependency
+          // Terms "currentPackageVersionBlock" == "Major.Minor.Patch" but not the "Build"
+          // Questions to be asked
+          // What is the currentPackageVersionBlock for this packagesDependency?
+          // const currentPackageVersion = devHubPackageVersionInfosBySubscriberPackageVersionMap.get(element.packageVersionId);
+          // const currentPackageVersionBlock = devHubPackageVersionsByPackageAndBranchMap.get(currentPackageVersion.)
+          // Is there a released version that is available on the main branch?
+          // Is there a newer version that is available on this currentPackageVersionBlock?
+          // Is there a newer Major.Minor version availble?
+          // Is there a newer Major version available?
+          // There is a distinction between "next available version" and "next avaialble released version"
+          // There is a distinction between "the base/null branch" verses the "feature branch" that is coming from Branch flag
+          // }
+          this.ux.log('');
+          this.ux.log('');
+        });
+      }
+
+      // theSfdxProject.getProjectDependenciesByPackageDirectoryPath().forEach( async (dependenciesForPackageDirectoryPath: ProjectPackageDirectoryDependency[], packageDirectoryPath: string) => {
+
+      // }); // end of evaluateOptions
     };
+
     // END OF Step 1D /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // await cli.prompt('What is your name?');
 
@@ -187,21 +213,17 @@ export default class Manage extends SfdxCommand {
     await evaluateOptions();
 
     // console.log('************************************************************************************************');
-    // console.log('packageDependencyChangeSet');
+    // console.log('packageDependencyChangeMap');
     // console.log('************************************************************************************************');
     const updatePackageDependencyList = async () => {
-      await this.asyncForEach(packageDependencyChangeSet, async (element: ProjectDependencyChange) => {
-        await theSfdxProject.changeToPackageVersion( element );
+      packageDependencyChangeMap.forEach( async (packageDependencyChanges: ProjectDependencyChange[], packageDirectoryPath: string) => {
+        await this.asyncForEach(packageDependencyChanges, async (element: ProjectDependencyChange) => {
+          await theSfdxProject.changeToPackageVersion( element, packageDirectoryPath );
+        });
       });
     };
 
     await updatePackageDependencyList();
-
-    // console.log('About to write to the sfdx-project.json file');
-    // await theSfdxProject.write();
-    // console.log('finished writing to the sfdx-project.json file');
-
-    // console.log('************************************************************************************************');
 
     return;
   }

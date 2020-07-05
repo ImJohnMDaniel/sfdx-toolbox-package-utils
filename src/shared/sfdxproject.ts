@@ -1,5 +1,5 @@
 import { core } from '@salesforce/command';
-import { ConfigContents } from '@salesforce/core';
+import { PackageDir, PackageDirDependency } from '@salesforce/core/lib/sfdxProject';
 import { AnyJson, JsonArray, JsonMap } from '@salesforce/ts-types';
 import * as _ from 'lodash';
 import { ProjectDependencyChange } from '../types/project_dependency_change';
@@ -17,42 +17,36 @@ export class SfdxProjects {
     }
 
     private sfdxProjectJson: core.SfdxProjectJson;
-    // private hubOrg: Org;
-    // private ux: UX;
 
     private constructor( sfdxProjectJson: core.SfdxProjectJson ) {
         this.sfdxProjectJson = sfdxProjectJson;
-        // this.hubOrg = thisDevHubOrg;
-        // this.ux = thisUx;
-        // console.log(this.sfdxProjectJson.values());
-        // console.log(this.sfdxProjectJson.getContents());
     }
 
-    public async write() {
-        const newContents: ConfigContents = await this.sfdxProjectJson.read();
-        // newContents.
-        await this.sfdxProjectJson.write( newContents );
-
-    }
-
-    public async changeToPackageVersion( dependencyChange: ProjectDependencyChange ) {
+    public async changeToPackageVersion( dependencyChange: ProjectDependencyChange, packageDirectoryPath: string ) {
 
         // console.log('************************************************************************************************');
         // console.log(this.sfdxProjectJson);
-        console.log('************************************************************************************************');
-        console.log('dependencyChange.getOldVersionAlias()' );
-        console.log( dependencyChange.getOldVersionAlias() );
-        console.log('************************************************************************************************');
-        console.log('dependencyChange.getOldVersionDependency()' );
-        console.log( dependencyChange.getOldVersionDependency() );
-        console.log('************************************************************************************************');
-        console.log(this.sfdxProjectJson.getContents().packageDirectories);
-        console.log('************************************************************************************************');
-        console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
-        console.log('************************************************************************************************');
-        console.log( dependencyChange.getOldVersionAlias() );
-        console.log('************************************************************************************************');
-
+        // console.log('************************************************************************************************');
+        // console.log('dependencyChange.getOldVersionAlias()' );
+        // console.log( dependencyChange.getOldVersionAlias() );
+        // console.log('************************************************************************************************');
+        // console.log('dependencyChange.getOldVersionDependency()' );
+        // console.log( dependencyChange.getOldVersionDependency() );
+        // console.log('************************************************************************************************');
+        // console.log('dependencyChange.getNewVersionAlias()' );
+        // console.log( dependencyChange.getNewVersionAlias() );
+        // console.log('************************************************************************************************');
+        // console.log('dependencyChange.getNewVersionDependency()' );
+        // console.log( dependencyChange.getNewVersionDependency() );
+        // console.log('************************************************************************************************');
+        // console.log('this.sfdxProjectJson.getContents().packageDirectories');
+        // console.log(this.sfdxProjectJson.getContents().packageDirectories);
+        // console.log('************************************************************************************************');
+        // console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
+        // console.log('************************************************************************************************');
+        // console.log( dependencyChange.getOldVersionAlias() );
+        // console.log('************************************************************************************************');
+        // console.log('real processing logic begins here');
         // basic pattern
         // 1) get the in memmory object representation of sfdx-project.json from this.sfdxProjectJson.getContents()
         // 2) follow the "packageDirectories" objects and then "dependencies" sub-objects
@@ -60,18 +54,51 @@ export class SfdxProjects {
         // 4) use the embedded "write()" method from await this.sfdxProjectJson.write();
 
         // scenarios to account for
-        // How to add a new, previously unseen dependency?
-        // Need to get confirmation before these changes are written... otherwise just display a dry run and maybe display "new" sfdx-project.json
+        // 1) How to add a new, previously unseen dependency?
+        // 2) Need to get confirmation before these changes are written... otherwise just display a dry run and maybe display "new" sfdx-project.json
+        // 3) If a dependency is a floating snapshot and the user does not make a change, the dependency should not be changed.
 
-        this.sfdxProjectJson.getContents().packageDirectories[0].dependencies[0].package = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
-        this.sfdxProjectJson.getContents().packageDirectories[0].dependencies[0].versionNumber = undefined;
+        // loop through each of the package directories
+        this.sfdxProjectJson.getContents().packageDirectories.forEach((packageDirectory: PackageDir) => {
+            console.log('Starting loop on packageDirectory : ' + packageDirectory.path);
+
+            if ( packageDirectory.path === packageDirectoryPath ) {
+                if ( packageDirectory.dependencies ) {
+                    // then loop through each of the dependencies in that package directory
+                    packageDirectory.dependencies.forEach( (aDependency: PackageDirDependency) => {
+                        console.log('Starting loop on dependency : ' + aDependency.package);
+                        // check to see if the OldVersionDependency refers to this location
+                        // aDependency.package values can be an 0Ho id, 04t id, or an alias of either
+                        if (aDependency.package === dependencyChange.getOldVersionDependency().getPackage2Id() // match the 0Ho id
+                            || aDependency.package === dependencyChange.getOldVersionDependency().getSubscriberPackageVersionId() // match the 04t id
+                            || aDependency.package === dependencyChange.getOldVersionDependency().getSubscriberPackageVersionId() ) { // TODO: correct this logic
+                            // this is the correct package
+                            aDependency.package = dependencyChange.getNewVersionAlias();
+                            aDependency.versionNumber = undefined;
+
+                            // add the alias
+                            this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
+                            this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getOldVersionAlias()] = undefined;
+                        }
+                    });
+                }
+            }
+            // else {
+                // eventually logic will go here to add a dependency to this particular package
+            // }
+            // this.devHubPackageInfosBySubscriberPackageMap.set(element.Id, element);
+        });
+
+        // this.sfdxProjectJson.getContents().packageDirectories[0].dependencies[0].package = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
+        // this.sfdxProjectJson.getContents().packageDirectories[0].dependencies[0].versionNumber = undefined;
 
         await this.sfdxProjectJson.write();
-        console.log('************************************************************************************************');
-        console.log(this.sfdxProjectJson.getContents().packageDirectories);
-        console.log('************************************************************************************************');
-        console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
-        console.log('************************************************************************************************');
+        // console.log('write occurs here');
+        // console.log('************************************************************************************************');
+        // console.log(this.sfdxProjectJson.getContents().packageDirectories);
+        // console.log('************************************************************************************************');
+        // console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
+        // console.log('************************************************************************************************');
         console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
     }
 
@@ -113,9 +140,6 @@ export class SfdxProjects {
     }
 
     public getDependencyDisplayName(projectDependency: ProjectPackageDirectoryDependency) {
-        // console.log('getDependencyDisplayName starts');
-        // console.log(projectDependency);
-
         const dependencyAlias = this.findAliasForProjectDependency(projectDependency);
         let dependencyDisplayName;
 
@@ -127,36 +151,33 @@ export class SfdxProjects {
         }
 
         return dependencyDisplayName;
-
     }
 
-    public getProjectDependencies(): ProjectPackageDirectoryDependency[] {
-        const projectDependencies: ProjectPackageDirectoryDependency[] = [];
+    // TODO: refactor this to return a map of string:ProjectPackageDirectoryDependency[] where the string key is the packageDirectory.path
+    //      This will be needed in order to ensure that updates are specific to the correct packageDirectory and not universal
+    public getProjectDependenciesByPackageDirectoryPath(): Map<string, ProjectPackageDirectoryDependency[]> {
+
+        const outputMap = new Map<string, ProjectPackageDirectoryDependency[]>();
 
         for (const packageDirectory of this.getPackageDirectories()) {
+            outputMap.set( packageDirectory['path'], [] );
+
             for (const dependency of this.getDependenciesForPackageDirectory(packageDirectory)) {
-                // console.log(dependency);
-                projectDependencies.push(new ProjectPackageDirectoryDependency( this.resolveDependencyAliases(dependency)));
+                outputMap.get(packageDirectory['path']).push(new ProjectPackageDirectoryDependency( this.resolveDependencyAliases(dependency)));
             }
         }
 
-        return projectDependencies;
+        return outputMap;
     }
 
     private resolveDependencyAliases( dependency: AnyJson ): AnyJson {
-        // console.log('dependency starts as === ');
-        // console.log(dependency);
         if ( Object.keys(dependency).find(item => item === 'package') ) {
             dependency['package'] = this.resolveAlias(dependency['package']);
         }
-        // console.log('dependency is now === ');
-        // console.log(dependency);
-
         return dependency;
     }
 
     private getAliases(): AnyJson {
-        // return _.get(this.sfdxProjectJson['contents'], 'packageAliases');
         return this.sfdxProjectJson.get('packageAliases');
     }
 

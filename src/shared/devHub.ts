@@ -132,13 +132,18 @@ export class DevHubDependencies {
     }
 
     private createVersionAliasSegment(packageVersion: DevHubPackageVersion ): string {
-        return packageVersion.Version + (packageVersion.Branch ? '-' + packageVersion.Branch : '');
+        return this.createVersionAliasSegmentString( packageVersion.Version, packageVersion.Branch );
+    }
+
+    private createVersionAliasSegmentString(version: string, branch?: string) {
+        const versionNumbers = version.split('.');
+        return versionNumbers[0] + '.' + versionNumbers[1] + '.' + versionNumbers[2] + '-' + versionNumbers[3] + (branch ? '-' + branch : '');
     }
 
     private createOption(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
         const option = new InquirerOption();
         option.value = packageVersion.SubscriberPackageVersionId;
-        option.short = packageVersion.Version + (branchText ? '-' + branchText : '');
+        option.short = this.createVersionAliasSegmentString( packageVersion.Version, branchText );
         option.name = extraNameText + ': ' + this.createVersionAliasSegment(packageVersion);
         return option;
     }
