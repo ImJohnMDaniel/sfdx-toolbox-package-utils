@@ -60,25 +60,41 @@ export class SfdxProjects {
 
         // loop through each of the package directories
         this.sfdxProjectJson.getContents().packageDirectories.forEach((packageDirectory: PackageDir) => {
-            console.log('Starting loop on packageDirectory : ' + packageDirectory.path);
+            // console.log('Starting loop on packageDirectory : ' + packageDirectory.path);
 
             if ( packageDirectory.path === packageDirectoryPath ) {
                 if ( packageDirectory.dependencies ) {
                     // then loop through each of the dependencies in that package directory
                     packageDirectory.dependencies.forEach( (aDependency: PackageDirDependency) => {
-                        console.log('Starting loop on dependency : ' + aDependency.package);
+                        // console.log('Starting loop on dependency : ' + aDependency.package);
                         // check to see if the OldVersionDependency refers to this location
                         // aDependency.package values can be an 0Ho id, 04t id, or an alias of either
                         if (aDependency.package === dependencyChange.getOldVersionDependency().getPackage2Id() // match the 0Ho id
-                            || aDependency.package === dependencyChange.getOldVersionDependency().getSubscriberPackageVersionId() // match the 04t id
-                            || aDependency.package === dependencyChange.getOldVersionDependency().getSubscriberPackageVersionId() ) { // TODO: correct this logic
+                            || aDependency.package === dependencyChange.getOldVersionDependency().getSubscriberPackageVersionId() ) { // match the 04t id
+
                             // this is the correct package
-                            aDependency.package = dependencyChange.getNewVersionAlias();
-                            aDependency.versionNumber = undefined;
+                            if ( dependencyChange.isPinned() ) {
+                                // console.log('pinned');
+                                // this is a pinned, non-snapshot version
+                                aDependency.package = dependencyChange.getNewVersionAlias();
+                                aDependency.versionNumber = undefined;
+                                // add the alias
+                                this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
+                            } else {
+                                // this is a non-pinned, snapshot version
+                                // console.log('non-pinned');
+
+                                // "package": "0Ho1T000000PAsXSAW",
+                                // "versionNumber": "0.1.0.LATEST"
+                                aDependency.package = dependencyChange.getNewVersionAlias();
+                                aDependency.versionNumber = dependencyChange.getNewPackageSnapshotDependency().getVersionNumber();
+                                this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewPackageSnapshotDependency().getPackage2Id();
+                            }
 
                             // add the alias
-                            this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
-                            this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getOldVersionAlias()] = undefined;
+                            if (dependencyChange.getOldVersionAlias() !== dependencyChange.getNewVersionAlias()) {
+                                this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getOldVersionAlias()] = undefined;
+                            }
                         }
                     });
                 }

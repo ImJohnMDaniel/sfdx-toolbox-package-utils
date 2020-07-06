@@ -24,8 +24,9 @@ export class DevHubDependencies {
     private currentPackageDependency: ProjectPackageDirectoryDependency;
     //                                                      PACKAGE2ID  BRANCH      MAJOR       MINOR       PATCH       BUILD
     private devHubPackageVersionInfosByPackageAndBranchMap: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>;
+    //                                                              PACKAGE2ID  BRANCH      MAJOR       MINOR       PATCH       BUILD
     private devHubPackageVersionInfosReleasedByPackageAndBranchMap: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>;
-    private devHubPackageVersionInfosBySubscriberPackageVersionMap: Map<string, DevHubPackageVersion>;
+    private devHubPackageVersionInfosBySubscriberPackageVersionMap: Map<string, DevHubPackageVersion>; // SubscriberPackageVersionID is the key
     private devHubPackageInfosBySubscriberPackageMap: Map<string, DevHubPackage>;
 
     private constructor(thisUx: UX, allPackageInfosFromDevHub: DevHubPackage[], allPackageVersionInfosFromDevHub: DevHubPackageVersion[]) {
@@ -83,18 +84,20 @@ export class DevHubDependencies {
         this.logger(options.length);
         this.findLatestBuildReleased(options);
         this.logger('mark 2E');
+        this.createSnapshotSameMajorMinorPatchVersion(options);
+        this.logger('mark 2F');
         this.logger(options.length);
 
         // add the current version to allow for no change
         if ( this.currentPackageDependency.getSubscriberPackageVersionId() ) {
-            options.push(this.createOption( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()), 'Current version specified', this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
+            options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()), 'Current version specified', this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
         }
 
         return options;
     }
 
     public getAlias(): string {
-        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ? this.createAlias( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ) : undefined;
+        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ? this.createAliasForPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ) : undefined;
     }
 
     /**
@@ -114,7 +117,15 @@ export class DevHubDependencies {
     }
 
     public findAliasForSubscriberPackageVersionId(subscriberPackageVersionId: string): string {
-        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId) ? this.createAlias( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId) ) : undefined;
+        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId) 
+                        ? this.createAliasForPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId) )
+                        : undefined;
+    }
+
+    public findAliasForPackage2Id(package2Id: string): string {
+        return this.devHubPackageInfosBySubscriberPackageMap.has(package2Id)
+                        ? this.createAliasForPackage( this.devHubPackageInfosBySubscriberPackageMap.get(package2Id) )
+                        : undefined;
     }
 
     public findDependencyBySubscriberPackageVersionId(subscriberPackageVersionId: string): DevHubPackageVersion {
@@ -123,11 +134,14 @@ export class DevHubDependencies {
                         : undefined;
     }
 
-    private createAlias(packageVersion: DevHubPackageVersion ): string {
-        // console.log(packageVersion);
-        // console.log(this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id));
-        return (this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id).NamespacePrefix ? (this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id).NamespacePrefix + '.') : '')
-                    + this.devHubPackageInfosBySubscriberPackageMap.get(packageVersion.Package2Id).Name + '@'
+    private createAliasForPackage(aPackage: DevHubPackage): string {
+        return (aPackage.NamespacePrefix ? (aPackage.NamespacePrefix + '.') : '')
+                    + aPackage.Name;
+    }
+
+    private createAliasForPackageVersion(packageVersion: DevHubPackageVersion ): string {
+        return (packageVersion.NamespacePrefix ? (packageVersion.NamespacePrefix + '.') : '')
+                    + packageVersion.Package2Name + '@'
                     + this.createVersionAliasSegment(packageVersion);
     }
 
@@ -140,7 +154,7 @@ export class DevHubDependencies {
         return versionNumbers[0] + '.' + versionNumbers[1] + '.' + versionNumbers[2] + '-' + versionNumbers[3] + (branch ? '-' + branch : '');
     }
 
-    private createOption(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
+    private createOptionBySubscriberPackageVersionId(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
         const option = new InquirerOption();
         option.value = packageVersion.SubscriberPackageVersionId;
         option.short = this.createVersionAliasSegmentString( packageVersion.Version, branchText );
@@ -148,12 +162,35 @@ export class DevHubDependencies {
         return option;
     }
 
+    private createOptionByPackage2Id(packageVersion: DevHubPackageVersion, extraNameText: string): InquirerOption {
+        const aliasSegment: string = packageVersion.MajorVersion + '.' + packageVersion.MinorVersion + '.' + packageVersion.PatchVersion + '.LATEST';
+
+        const option = new InquirerOption();
+        option.value = packageVersion.Package2Id + '|' + aliasSegment;
+        option.short = aliasSegment;
+        option.name = extraNameText;
+
+        return option;
+    }
+
+    private createSnapshotSameMajorMinorPatchVersion(options: InquirerOption[]) {
+        if ( this.currentBranch ) {
+            const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
+
+            if (currentBuildBlock) {
+                options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Snapshot latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' build'));
+            } else {
+                this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
+            }
+        }
+    }
+
     private findLaterBuildSameMajorMinorVersion(options: InquirerOption[]) {
         if ( this.currentBranch ) {
             const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, this.currentBranch);
 
             if (currentBuildBlock) {
-                options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on \'' + this.currentBranch + '\' branch', this.currentBranch));
+                options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on \'' + this.currentBranch + '\' branch', this.currentBranch));
             } else {
                 this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
             }
@@ -164,7 +201,7 @@ export class DevHubDependencies {
         const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
 
         if (currentBuildBlock) {
-            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on main build branch', undefined));
+            options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on main build branch', undefined));
         } else {
             this.ux.log('No option found for latest build on the main build branch');
         }
@@ -175,7 +212,7 @@ export class DevHubDependencies {
             const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
 
             if (currentBuildBlock) {
-                options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on \'' + this.currentBranch + '\' branch', this.currentBranch));
+                options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on \'' + this.currentBranch + '\' branch', this.currentBranch));
             } else {
                 this.ux.log('No option found for latest build on branch : ' + this.currentBranch);
             }
@@ -186,7 +223,7 @@ export class DevHubDependencies {
         const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosReleasedByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
 
         if (currentBuildBlock) {
-            options.push(this.createOption(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest released version on main build branch', undefined));
+            options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest released version on main build branch', undefined));
         } else {
             this.ux.log('No option found for released version build on main build branch');
         }

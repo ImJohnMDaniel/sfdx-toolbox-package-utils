@@ -26,8 +26,10 @@ export class ProjectPackageDirectoryDependency {
     private buildVersion: number;
     private isLATESTSpecified: boolean = false;
 
-    constructor(projectPackageDirectoryDependency: AnyJson) {
-        this.processProjectPackageDirectoryDependencyJson(projectPackageDirectoryDependency);
+    constructor(projectPackageDirectoryDependency?: AnyJson) {
+        if ( projectPackageDirectoryDependency !== undefined ) {
+            this.processProjectPackageDirectoryDependencyJson(projectPackageDirectoryDependency);
+        }
     }
 
     public getSubscriberPackageVersionId(): string {
@@ -133,4 +135,3 @@ export class ProjectPackageDirectoryDependency {
         }
     }
 }
-

@@ -1,6 +1,7 @@
 import { core, flags, SfdxCommand } from '@salesforce/command';
 import * as inquirer from 'inquirer';
 import * as _ from 'lodash';
+import { Constants } from '../../../../shared/constants';
 import { DevHubDependencies } from '../../../../shared/devHub';
 import { SfdxProjects } from '../../../../shared/sfdxproject';
 import { ProjectDependencyChange } from '../../../../types/project_dependency_change';
@@ -62,6 +63,8 @@ export default class Manage extends SfdxCommand {
       //   console.log(key, value);
       // }
 
+      let aProjectDependencyChange: ProjectDependencyChange;
+
       // await this.asyncForEach( theSfdxProject.getProjectDependenciesByPackageDirectoryPath().keys(), async (packageDirectoryPath: string) => {
       for (const [packageDirectoryPath, dependenciesForPackageDirectoryPath] of theSfdxProject.getProjectDependenciesByPackageDirectoryPath()) {
         // console.log('Hello Again.... ' + packageDirectoryPath);
@@ -119,19 +122,43 @@ export default class Manage extends SfdxCommand {
               //  Need to setup a ProjectPackageDirectoryDependency from the element
               //    The selection tool will find the originalVersion and replace it with newVersion
 
-              const aProjectDependencyChange = new ProjectDependencyChange()
-                                                          .setOldVersion( element, theOriginalVersionAlias )
-                                                          .setNewVersion( theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version)
-                                                                      , theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version));
+              // console.log('***************************************************************************************************');
+              // console.log('element - theOriginalVersionDependency');
+              // console.log(element);
+              // console.log('***************************************************************************************************');
+              // console.log('theOriginalVersionAlias');
+              // console.log(theOriginalVersionAlias);
+              // console.log('***************************************************************************************************');
+              // console.log('packageVersionSelectionResponses.version');
+              // console.log(packageVersionSelectionResponses.version);
+              // console.log('***************************************************************************************************');
+              // console.log('findDependencyBySubscriberPackageVersionId');
+              // console.log(theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version));
+              // console.log('***************************************************************************************************');
+              // console.log('findAliasForSubscriberPackageVersionId');
+              // console.log(theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version));
+              // console.log('***************************************************************************************************');
 
-              // const packageDependencyChange = {
-              //   package: element.getPackage2Id(),
-              //   originalVersion: element.getVersionNumber(),
-              //   originalVersionSubscriberPackageVersionId: element.getSubscriberPackageVersionId(),
-              //   newVersionSubscriberPackageVersionId: packageVersionSelectionResponses.version,
-              //   originalVersionAlias: theOriginalVersionAlias,
-              //   newVersionAlias: theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version)
-              // };
+              if ( packageVersionSelectionResponses.version
+                  && (packageVersionSelectionResponses.version as string).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX) ) {
+                // console.log('pinned route');
+                aProjectDependencyChange = new ProjectDependencyChange()
+                    .setOldVersion( theOriginalVersionAlias, element )
+                    .setNewVersion( theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version)
+                                  , theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version));
+              } else {
+                // console.log('non-pinned route');
+                const packageSnapshotDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
+                packageSnapshotDependency.setPackageAndVersionNumber( (packageVersionSelectionResponses.version as string).split('|')[0], (packageVersionSelectionResponses.version as string).split('|')[1]);
+                aProjectDependencyChange = new ProjectDependencyChange()
+                    .setOldVersion( theOriginalVersionAlias, element )
+                    .setNewVersion( theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0])
+                                  , undefined
+                                  , packageSnapshotDependency);
+              }
+              // console.log('aProjectDependencyChange');
+              // console.log(aProjectDependencyChange);
+              // console.log('***************************************************************************************************');
 
               packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
             } else {
