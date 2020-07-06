@@ -80,6 +80,9 @@ export class SfdxProjects {
                                 aDependency.versionNumber = undefined;
                                 // add the alias
                                 this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
+
+                                console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
+
                             } else {
                                 // this is a non-pinned, snapshot version
                                 // console.log('non-pinned');
@@ -89,6 +92,8 @@ export class SfdxProjects {
                                 aDependency.package = dependencyChange.getNewVersionAlias();
                                 aDependency.versionNumber = dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber();
                                 this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewPackageNonPinnedDependency().getPackage2Id();
+
+                                console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() + '@' + dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber() );
                             }
 
                             // add the alias
@@ -115,7 +120,6 @@ export class SfdxProjects {
         // console.log('************************************************************************************************');
         // console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
         // console.log('************************************************************************************************');
-        console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
     }
 
     /**

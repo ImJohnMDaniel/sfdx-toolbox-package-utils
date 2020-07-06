@@ -101,9 +101,6 @@ export default class Manage extends SfdxCommand {
                 choices: dependencyPackageChoices,
                 pageSize: 8
               }]);
-              // console.log(packageVersionSelectionResponses);
-              this.ux.log('');
-              this.ux.log(`${dependencyPackageDisplayName} version selected: ${packageVersionSelectionResponses.version}`);
 
               let theOriginalVersionAlias = theDevHubDependencies.getAlias() ;
 
@@ -139,17 +136,23 @@ export default class Manage extends SfdxCommand {
               // console.log(theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version));
               // console.log('***************************************************************************************************');
 
+              let newDependencyAlias: string;
+
               if ( packageVersionSelectionResponses.version
                   && (packageVersionSelectionResponses.version as string).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX) ) {
                 // console.log('pinned route');
+                newDependencyAlias = theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version);
                 aProjectDependencyChange = new ProjectDependencyChange()
                     .setOldVersion( theOriginalVersionAlias, element )
-                    .setNewVersion( theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version)
+                    .setNewVersion( newDependencyAlias
                                   , theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version));
               } else {
                 // console.log('non-pinned route');
                 const packageNonPinnedDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
                 packageNonPinnedDependency.setPackageAndVersionNumber( (packageVersionSelectionResponses.version as string).split('|')[0], (packageVersionSelectionResponses.version as string).split('|')[1]);
+
+                newDependencyAlias = theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0]) + '@' + (packageVersionSelectionResponses.version as string).split('|')[1];
+
                 aProjectDependencyChange = new ProjectDependencyChange()
                     .setOldVersion( theOriginalVersionAlias, element )
                     .setNewVersion( theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0])
@@ -159,6 +162,8 @@ export default class Manage extends SfdxCommand {
               // console.log('aProjectDependencyChange');
               // console.log(aProjectDependencyChange);
               // console.log('***************************************************************************************************');
+              this.ux.log('');
+              this.ux.log(`${dependencyPackageDisplayName} version selected: ${newDependencyAlias}`);
 
               packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
             } else {
@@ -184,6 +189,7 @@ export default class Manage extends SfdxCommand {
           // There is a distinction between "the base/null branch" verses the "feature branch" that is coming from Branch flag
           // }
           this.ux.log('');
+          this.ux.log('****************************************************************************************');
           this.ux.log('');
         });
       }
