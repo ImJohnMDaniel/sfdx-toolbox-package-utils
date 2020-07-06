@@ -305,7 +305,7 @@ export class DevHubDependencies {
     // tslint:disable-next-line: no-any
     private findBlock(packageVersionMapToInspect: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>, chunkLevel: CHUNK_LEVEL, branchToEvalute: string): Map<number, any> {
         // packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
-        console.log('mark find 1');
+        // console.log('mark find 1');
         // console.log(this.currentPackageDependency);
         // console.log(this.currentPackageDependency.getPackage2Id());
         // console.log(branchToEvalute);
