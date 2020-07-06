@@ -174,15 +174,21 @@ export class DevHubDependencies {
     }
 
     private createNonPinnedSameMajorMinorPatchVersion(options: InquirerOption[]) {
-        if ( this.currentBranch ) {
-            const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
-
-            if (currentBuildBlock) {
-                options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Non-pinned latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' build'));
-            } else {
-                this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
-            }
+        // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
+        let currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
+        // console.log('currentBuildBlock 2');
+        // console.log(currentBuildBlock);
+        if (currentBuildBlock === undefined) {
+            currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, '');
+            // console.log('currentBuildBlock 3');
+            // console.log(currentBuildBlock);
         }
+        if (currentBuildBlock) {
+            options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Non-pinned latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' build'));
+        } else {
+            this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
+        }
+        // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
     }
 
     private findLaterBuildSameMajorMinorVersion(options: InquirerOption[]) {
@@ -299,13 +305,22 @@ export class DevHubDependencies {
     // tslint:disable-next-line: no-any
     private findBlock(packageVersionMapToInspect: Map<string, Map<string, Map<number, Map<number, Map<number, Map<number, DevHubPackageVersion>>>>>>, chunkLevel: CHUNK_LEVEL, branchToEvalute: string): Map<number, any> {
         // packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(this.currentBranch).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber());
-        // console.log('mark find 1');
+        console.log('mark find 1');
         // console.log(this.currentPackageDependency);
         // console.log(this.currentPackageDependency.getPackage2Id());
         // console.log(branchToEvalute);
         // console.log(packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()));
+
         let output;
         if ( packageVersionMapToInspect.has(this.currentPackageDependency.getPackage2Id()) ) {
+            // console.log('mark find 1.5');
+            // console.log('packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute)');
+            // console.log(packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute));
+            // console.log('branchToEvalute');
+            // console.log(branchToEvalute);
+
+            // If the branchToEvalute is undefined, treat it as an empty string
+            branchToEvalute = branchToEvalute === undefined ? '' : branchToEvalute;
             if (chunkLevel >= CHUNK_LEVEL.MAJOR
                 && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute) !== undefined) {
                 // console.log('mark find 2');
@@ -315,7 +330,7 @@ export class DevHubDependencies {
 
                 if (chunkLevel >= CHUNK_LEVEL.MINOR
                     && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()) !== undefined) {
-                        // console.log('mark find 3');
+                    // console.log('mark find 3');
                     if (chunkLevel >= CHUNK_LEVEL.PATCH
                         && packageVersionMapToInspect.get(this.currentPackageDependency.getPackage2Id()).get(branchToEvalute).get(this.currentPackageDependency.getMajorVersionNumber()).get(this.currentPackageDependency.getMinorVersionNumber()) !== undefined) {
                             // console.log('mark find 4');
