@@ -56,7 +56,7 @@ export class SfdxProjects {
         // scenarios to account for
         // 1) How to add a new, previously unseen dependency?
         // 2) Need to get confirmation before these changes are written... otherwise just display a dry run and maybe display "new" sfdx-project.json
-        // 3) If a dependency is a floating snapshot and the user does not make a change, the dependency should not be changed.
+        // 3) If a dependency is a floating non-pinned and the user does not make a change, the dependency should not be changed.
 
         // loop through each of the package directories
         this.sfdxProjectJson.getContents().packageDirectories.forEach((packageDirectory: PackageDir) => {
@@ -87,8 +87,8 @@ export class SfdxProjects {
                                 // "package": "0Ho1T000000PAsXSAW",
                                 // "versionNumber": "0.1.0.LATEST"
                                 aDependency.package = dependencyChange.getNewVersionAlias();
-                                aDependency.versionNumber = dependencyChange.getNewPackageSnapshotDependency().getVersionNumber();
-                                this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewPackageSnapshotDependency().getPackage2Id();
+                                aDependency.versionNumber = dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber();
+                                this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewPackageNonPinnedDependency().getPackage2Id();
                             }
 
                             // add the alias

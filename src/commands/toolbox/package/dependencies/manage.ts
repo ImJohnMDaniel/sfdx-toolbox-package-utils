@@ -22,7 +22,7 @@ export default class Manage extends SfdxCommand {
   protected static flagsConfig = {
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
     updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription') }),
-    updatetosnapshot: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToSnapshotDescription') })
+    updatetononpinned: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToNonPinnedDescription') })
   };
 
   // Comment this out if your command does not require an org username
@@ -148,13 +148,13 @@ export default class Manage extends SfdxCommand {
                                   , theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version));
               } else {
                 // console.log('non-pinned route');
-                const packageSnapshotDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
-                packageSnapshotDependency.setPackageAndVersionNumber( (packageVersionSelectionResponses.version as string).split('|')[0], (packageVersionSelectionResponses.version as string).split('|')[1]);
+                const packageNonPinnedDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
+                packageNonPinnedDependency.setPackageAndVersionNumber( (packageVersionSelectionResponses.version as string).split('|')[0], (packageVersionSelectionResponses.version as string).split('|')[1]);
                 aProjectDependencyChange = new ProjectDependencyChange()
                     .setOldVersion( theOriginalVersionAlias, element )
                     .setNewVersion( theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0])
                                   , undefined
-                                  , packageSnapshotDependency);
+                                  , packageNonPinnedDependency);
               }
               // console.log('aProjectDependencyChange');
               // console.log(aProjectDependencyChange);

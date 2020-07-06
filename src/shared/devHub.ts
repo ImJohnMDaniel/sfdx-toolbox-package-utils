@@ -84,7 +84,7 @@ export class DevHubDependencies {
         this.logger(options.length);
         this.findLatestBuildReleased(options);
         this.logger('mark 2E');
-        this.createSnapshotSameMajorMinorPatchVersion(options);
+        this.createNonPinnedSameMajorMinorPatchVersion(options);
         this.logger('mark 2F');
         this.logger(options.length);
 
@@ -173,12 +173,12 @@ export class DevHubDependencies {
         return option;
     }
 
-    private createSnapshotSameMajorMinorPatchVersion(options: InquirerOption[]) {
+    private createNonPinnedSameMajorMinorPatchVersion(options: InquirerOption[]) {
         if ( this.currentBranch ) {
             const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
 
             if (currentBuildBlock) {
-                options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Snapshot latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' build'));
+                options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Non-pinned latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' build'));
             } else {
                 this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
             }

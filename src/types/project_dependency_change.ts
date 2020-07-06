@@ -5,7 +5,7 @@ export class ProjectDependencyChange {
 
     private newVersionAlias: string;
     private newVersionDependency: DevHubPackageVersion;
-    private newPackageSnapshotDependency: ProjectPackageDirectoryDependency;
+    private newPackageNonPinnedDependency: ProjectPackageDirectoryDependency;
     private oldVersionAlias: string;
     private oldVersionDependency: ProjectPackageDirectoryDependency;
 
@@ -21,8 +21,8 @@ export class ProjectDependencyChange {
         return this.newVersionDependency;
     }
 
-    public getNewPackageSnapshotDependency(): ProjectPackageDirectoryDependency {
-        return this.newPackageSnapshotDependency;
+    public getNewPackageNonPinnedDependency(): ProjectPackageDirectoryDependency {
+        return this.newPackageNonPinnedDependency;
     }
 
     public getOldVersionDependency(): ProjectPackageDirectoryDependency {
@@ -35,14 +35,14 @@ export class ProjectDependencyChange {
         return this;
     }
 
-    public setNewVersion( newVersionAlias: string, newVersionDependency?: DevHubPackageVersion, newPackageSnapshotDependency?: ProjectPackageDirectoryDependency ): ProjectDependencyChange {
+    public setNewVersion( newVersionAlias: string, newVersionDependency?: DevHubPackageVersion, newPackageNonPinnedDependency?: ProjectPackageDirectoryDependency ): ProjectDependencyChange {
         this.newVersionAlias = newVersionAlias;
         this.newVersionDependency = newVersionDependency;
-        this.newPackageSnapshotDependency = newPackageSnapshotDependency;
+        this.newPackageNonPinnedDependency = newPackageNonPinnedDependency;
         return this;
     }
 
     public isPinned(): boolean {
-        return this.newPackageSnapshotDependency === undefined;
+        return this.newPackageNonPinnedDependency === undefined;
     }
 }
