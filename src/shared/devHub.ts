@@ -62,6 +62,18 @@ export class DevHubDependencies {
                 : undefined;
     }
 
+    public prepareRelatedNonPinnedDependencyOptionsForCurrentDependency(): InquirerOption[] {
+        const options: InquirerOption[] = [];
+        this.createNonPinnedSameMajorMinorPatchVersion(options);
+        return options;
+    }
+
+    public prepareRelatedReleasedDependencyOptionsForCurrentDependency(): InquirerOption[] {
+        const options: InquirerOption[] = [];
+        this.findLatestBuildReleased(options);
+        return options;
+    }
+
     public prepareRelatedDependencyOptionsForCurrentDependency(): InquirerOption[] {
         // Is there a released version that is available on the main branch?
         // Is there a newer version that is available on this currentPackageVersionBlock?
@@ -73,7 +85,7 @@ export class DevHubDependencies {
 
         this.logger('mark 2A');
         this.logger(options.length);
-        this.findLaterBuildSameMajorMinorVersion(options);
+        this.findLatestBuildSameMajorMinorVersion(options);
         this.logger('mark 2B');
         this.logger(options.length);
         this.findLatestMainBranchBuildVersion(options);
@@ -174,24 +186,34 @@ export class DevHubDependencies {
     }
 
     private createNonPinnedSameMajorMinorPatchVersion(options: InquirerOption[]) {
-        // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
+        console.log('createNonPinnedSameMajorMinorPatchVersion starts');
+
+        let versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber();
+
+        // In this case, the branch really doesn't matter.  Just either supply the currentBranch or empty space
         let currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
-        // console.log('currentBuildBlock 2');
+        console.log('currentBuildBlock 2');
         // console.log(currentBuildBlock);
         if (currentBuildBlock === undefined) {
             currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, '');
-            // console.log('currentBuildBlock 3');
+            console.log('currentBuildBlock 3');
+            // console.log(currentBuildBlock);
+        }
+        if (currentBuildBlock === undefined) {
+            currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, '');
+            versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber()
+            console.log('currentBuildBlock 4');
             // console.log(currentBuildBlock);
         }
         if (currentBuildBlock) {
-            options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Non-pinned latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' build'));
+            options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Non-pinned latest ' + versionNumber + ' build'));
         } else {
             this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
         }
-        // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
+        // console.log('createNonPinnedSameMajorMinorPatchVersion finishes');
     }
 
-    private findLaterBuildSameMajorMinorVersion(options: InquirerOption[]) {
+    private findLatestBuildSameMajorMinorVersion(options: InquirerOption[]) {
         if ( this.currentBranch ) {
             const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, this.currentBranch);
 

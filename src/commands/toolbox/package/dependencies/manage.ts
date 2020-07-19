@@ -39,6 +39,12 @@ export default class Manage extends SfdxCommand {
 
   public async run(): Promise<any> { // tslint:disable-line:no-any
 
+    // const isInteractiveMode = !this.flags.updatetoreleased && !this.flags.updatetononpinned;
+
+    // if (this.flags.json && isInteractiveMode) {
+    //   this.error("'--json' flag is not allowed in conjuection ");
+    // }
+
     // this.ux.startSpinner(messages.getMessage('commandSpinner')); // Spinners don't help in interactive mode
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     // const conn = this.org.getConnection();
