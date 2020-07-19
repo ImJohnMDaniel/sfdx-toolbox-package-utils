@@ -4,7 +4,7 @@
     "flagUpdateToReleasedDescription": "when used, all dependencies will be updated to latest, released package version",
     "flagUpdateToNonPinnedDescription": "when used, all dependencies that are owned by the current Dev Hub will be set to X.Y.Z.LATEST, unless the X.Y.Z version has been released",
     "commandSpinner": "Managing the dependencies...",
-    "examplesDescription": "$ sfdx toolbox:package:dependencies:manage --targetusername myOrg@example.com --targetdevhubusername devhub@org.com",
+    "examplesDescription": "$ sfdx toolbox:package:dependencies:manage --branch my-feature-branch --targetdevhubusername devhub@org.com",
     "messagePackageDependenciesFound": "Package dependencies found for package directory %s",
     "messagePackageDependencyNotManagedByDevHub": "The dependency '%s' is not managed by this Dev Hub.  Moving on to next dependency.",
     "messageReviewingOptionsForPackageDependency": "Preparing options from Dev Hub for dependency '%s'",
