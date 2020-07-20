@@ -39,7 +39,7 @@ export default class Manage extends SfdxCommand {
 
   public async run(): Promise<any> { // tslint:disable-line:no-any
 
-    // const isInteractiveMode = !this.flags.updatetoreleased && !this.flags.updatetononpinned;
+    const isInteractiveMode = !this.flags.updatetoreleased && !this.flags.updatetononpinned;
 
     // if (this.flags.json && isInteractiveMode) {
     //   this.error("'--json' flag is not allowed in conjuection ");
@@ -93,78 +93,92 @@ export default class Manage extends SfdxCommand {
             // console.log('theSfdxProject.findAlias(element.getSubscriberPackageVersionId()) == ' + theSfdxProject.findAlias(element.getSubscriberPackageVersionId()));
             this.ux.log(messages.getMessage('messageReviewingOptionsForPackageDependency', [dependencyDisplayName]));
             // console.log('mark 1');
+
             const dependencyPackageDisplayName = theSfdxProject.getDependencyPackageDisplayName(theDevHubDependencies.getPackage2IDForCurrentDependency());
+
             // console.log('mark 2');
-            const dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
+            let dependencyPackageChoices;
+
+            if (isInteractiveMode) {
+              dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
+            } else {
+              if ( this.flags.updatetoreleased ) {
+                dependencyPackageChoices = theDevHubDependencies.prepareRelatedReleasedDependencyOptionsForCurrentDependency();
+              } else if (this.flags.updatetononpinned) {
+                dependencyPackageChoices = theDevHubDependencies.prepareRelatedNonPinnedDependencyOptionsForCurrentDependency();
+              }
+            }
+
             // console.log('mark 3');
             this.ux.log('');
             if (dependencyPackageChoices.length > 0) {
-              // tslint:disable-next-line: no-any
-              const packageVersionSelectionResponses: any = await inquirer.prompt([{
-                name: 'version',
-                message: messages.getMessage('messageWhichVersionOfPackage', [dependencyPackageDisplayName]),
-                type: 'list',
-                choices: dependencyPackageChoices,
-                pageSize: 8
-              }]);
 
+              let newDependencyAlias: string;
               let theOriginalVersionAlias = theDevHubDependencies.getAlias() ;
 
               if ( !theOriginalVersionAlias ) {
                 theOriginalVersionAlias = theSfdxProject.findAliasForProjectDependency(element);
               }
 
-              // TODO: Need to change the transport object here. Instead of a custom mapping, it should be a custom mapping object with the following setup:
-              //    * the original {element:ProjectPackageDirectoryDependency}
-              //    * the new version {newVersion:ProjectPackageDirectoryDependency}
-              //    * the original version alias
-              //    * new version alias
-              //    The custom mapping object will have two key value pairs and the structure will be
-              //    *   originalVersion => custom object contains alias and ProjectPackageDirectoryDependency
-              //    *   newVersion => custom object contains alias and ProjectPackageDirectoryDependency
-              //  Need to setup a ProjectPackageDirectoryDependency from the element
-              //    The selection tool will find the originalVersion and replace it with newVersion
+              if ( isInteractiveMode ) {
+                // tslint:disable-next-line: no-any
+                const packageVersionSelectionResponses: any = await inquirer.prompt([{
+                  name: 'version',
+                  message: messages.getMessage('messageWhichVersionOfPackage', [dependencyPackageDisplayName]),
+                  type: 'list',
+                  choices: dependencyPackageChoices,
+                  pageSize: 8
+                }]);
 
-              // console.log('***************************************************************************************************');
-              // console.log('element - theOriginalVersionDependency');
-              // console.log(element);
-              // console.log('***************************************************************************************************');
-              // console.log('theOriginalVersionAlias');
-              // console.log(theOriginalVersionAlias);
-              // console.log('***************************************************************************************************');
-              // console.log('packageVersionSelectionResponses.version');
-              // console.log(packageVersionSelectionResponses.version);
-              // console.log('***************************************************************************************************');
-              // console.log('findDependencyBySubscriberPackageVersionId');
-              // console.log(theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version));
-              // console.log('***************************************************************************************************');
-              // console.log('findAliasForSubscriberPackageVersionId');
-              // console.log(theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version));
-              // console.log('***************************************************************************************************');
-
-              let newDependencyAlias: string;
-
-              if ( packageVersionSelectionResponses.version
+                if ( packageVersionSelectionResponses.version
                   && (packageVersionSelectionResponses.version as string).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX) ) {
-                // console.log('pinned route');
-                newDependencyAlias = theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version);
-                aProjectDependencyChange = new ProjectDependencyChange()
-                    .setOldVersion( theOriginalVersionAlias, element )
-                    .setNewVersion( newDependencyAlias
+                  // console.log('pinned route');
+                  newDependencyAlias = theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version);
+                  aProjectDependencyChange = new ProjectDependencyChange()
+                      .setOldVersion( theOriginalVersionAlias, element )
+                      .setNewVersion( newDependencyAlias
                                   , theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version));
-              } else {
-                // console.log('non-pinned route');
-                const packageNonPinnedDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
-                packageNonPinnedDependency.setPackageAndVersionNumber( (packageVersionSelectionResponses.version as string).split('|')[0], (packageVersionSelectionResponses.version as string).split('|')[1]);
+                } else {
+                  // console.log('non-pinned route');
+                  const packageNonPinnedDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
+                  packageNonPinnedDependency.setPackageAndVersionNumber( (packageVersionSelectionResponses.version as string).split('|')[0], (packageVersionSelectionResponses.version as string).split('|')[1]);
 
-                newDependencyAlias = theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0]) + '@' + (packageVersionSelectionResponses.version as string).split('|')[1];
+                  newDependencyAlias = theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0]) + '@' + (packageVersionSelectionResponses.version as string).split('|')[1];
 
-                aProjectDependencyChange = new ProjectDependencyChange()
-                    .setOldVersion( theOriginalVersionAlias, element )
-                    .setNewVersion( theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0])
+                  aProjectDependencyChange = new ProjectDependencyChange()
+                      .setOldVersion( theOriginalVersionAlias, element )
+                      .setNewVersion( theDevHubDependencies.findAliasForPackage2Id((packageVersionSelectionResponses.version as string).split('|')[0])
                                   , undefined
                                   , packageNonPinnedDependency);
+                }
+              } else {
+                const dependencyPackageChoice = dependencyPackageChoices[0];
+                console.log(dependencyPackageChoice);
+
+                if ( dependencyPackageChoice.value
+                  && (dependencyPackageChoice.value as string).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX) ) {
+
+                  newDependencyAlias = theDevHubDependencies.findAliasForSubscriberPackageVersionId(dependencyPackageChoice.value);
+                  aProjectDependencyChange = new ProjectDependencyChange()
+                        .setOldVersion( theOriginalVersionAlias, element )
+                        .setNewVersion( newDependencyAlias
+                                    , theDevHubDependencies.findDependencyBySubscriberPackageVersionId(dependencyPackageChoice.value));
+
+                } else {
+                  const packageNonPinnedDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
+                  packageNonPinnedDependency.setPackageAndVersionNumber( (dependencyPackageChoice.value as string).split('|')[0], (dependencyPackageChoice.value as string).split('|')[1]);
+
+                  newDependencyAlias = theDevHubDependencies.findAliasForPackage2Id((dependencyPackageChoice.value as string).split('|')[0]) + '@' + (dependencyPackageChoice.value as string).split('|')[1];
+
+                  aProjectDependencyChange = new ProjectDependencyChange()
+                      .setOldVersion( theOriginalVersionAlias, element )
+                      .setNewVersion( theDevHubDependencies.findAliasForPackage2Id((dependencyPackageChoice.value as string).split('|')[0])
+                                  , undefined
+                                  , packageNonPinnedDependency);
+
+                }
               }
+
               // console.log('aProjectDependencyChange');
               // console.log(aProjectDependencyChange);
               // console.log('***************************************************************************************************');
