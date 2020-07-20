@@ -21,8 +21,8 @@ export default class Manage extends SfdxCommand {
 
   protected static flagsConfig = {
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
-    updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription') }),
-    updatetononpinned: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToNonPinnedDescription') })
+    updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription'), exclusive: ['updatetolatest'] }),
+    updatetolatest: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToNonPinnedDescription'), exclusive: ['updatetoreleased']})
   };
 
   // Comment this out if your command does not require an org username
