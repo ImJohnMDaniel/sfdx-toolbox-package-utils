@@ -129,7 +129,7 @@ export class DevHubDependencies {
     }
 
     public findAliasForSubscriberPackageVersionId(subscriberPackageVersionId: string): string {
-        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId) 
+        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId)
                         ? this.createAliasForPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId) )
                         : undefined;
     }
@@ -201,7 +201,7 @@ export class DevHubDependencies {
         }
         if (currentBuildBlock === undefined) {
             currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, '');
-            versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber()
+            versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber();
             console.log('currentBuildBlock 4');
             // console.log(currentBuildBlock);
         }
