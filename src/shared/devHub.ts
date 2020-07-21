@@ -76,7 +76,7 @@ export class DevHubDependencies {
 
     public prepareSameDependencyOptionForCurrentDependency(): InquirerOption[] {
         const options: InquirerOption[] = [];
-        options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()), 'Current version specified', this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
+        this.createSameOptionAsCurrent(options);
         return options;
     }
 
@@ -104,12 +104,8 @@ export class DevHubDependencies {
         this.logger('mark 2E');
         this.createNonPinnedSameMajorMinorPatchVersion(options);
         this.logger('mark 2F');
+        this.createSameOptionAsCurrent(options);
         this.logger(options.length);
-
-        // add the current version to allow for no change
-        if ( this.currentPackageDependency.getSubscriberPackageVersionId() ) {
-            options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()), 'Current version specified', this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
-        }
 
         return options;
     }
@@ -189,6 +185,13 @@ export class DevHubDependencies {
         option.name = extraNameText;
 
         return option;
+    }
+
+    private createSameOptionAsCurrent(options: InquirerOption[]) {
+        // add the current version to allow for no change
+        if ( this.currentPackageDependency.getSubscriberPackageVersionId() ) {
+            options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()), 'Current version specified', this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
+        }
     }
 
     private createNonPinnedSameMajorMinorPatchVersion(options: InquirerOption[]) {
