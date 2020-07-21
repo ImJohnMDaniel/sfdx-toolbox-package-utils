@@ -91,6 +91,7 @@ export class SfdxProjects {
                                 // "versionNumber": "0.1.0.LATEST"
                                 aDependency.package = dependencyChange.getNewVersionAlias();
                                 aDependency.versionNumber = dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber();
+                                // add the alias
                                 this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewPackageNonPinnedDependency().getPackage2Id();
 
                                 console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() + '@' + dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber() );

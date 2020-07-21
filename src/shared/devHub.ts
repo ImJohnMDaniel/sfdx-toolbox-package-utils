@@ -74,6 +74,12 @@ export class DevHubDependencies {
         return options;
     }
 
+    public prepareSameDependencyOptionForCurrentDependency(): InquirerOption[] {
+        const options: InquirerOption[] = [];
+        options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()), 'Current version specified', this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
+        return options;
+    }
+
     public prepareRelatedDependencyOptionsForCurrentDependency(): InquirerOption[] {
         // Is there a released version that is available on the main branch?
         // Is there a newer version that is available on this currentPackageVersionBlock?
@@ -186,23 +192,31 @@ export class DevHubDependencies {
     }
 
     private createNonPinnedSameMajorMinorPatchVersion(options: InquirerOption[]) {
-        console.log('createNonPinnedSameMajorMinorPatchVersion starts');
+        // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
+
+
+// How does this method ensure that the version requested doesn't have a released version
+//      from a later version.
+//      If you ask for 0.1.0.LATEST but there is a version 0.2.0.x that is released, then what should be returned?
+//          0.1.0.LATEST --- no
+//          0.2.0.LATEST --- no, the 0.2.0 is already released
+//          0.3.0.LATEST --- probably
 
         let versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber();
 
         // In this case, the branch really doesn't matter.  Just either supply the currentBranch or empty space
         let currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
-        console.log('currentBuildBlock 2');
+        // console.log('currentBuildBlock 2');
         // console.log(currentBuildBlock);
         if (currentBuildBlock === undefined) {
             currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, '');
-            console.log('currentBuildBlock 3');
+            // console.log('currentBuildBlock 3');
             // console.log(currentBuildBlock);
         }
         if (currentBuildBlock === undefined) {
             currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, '');
             versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber();
-            console.log('currentBuildBlock 4');
+            // console.log('currentBuildBlock 4');
             // console.log(currentBuildBlock);
         }
         if (currentBuildBlock) {

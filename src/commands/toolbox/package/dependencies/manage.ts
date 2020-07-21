@@ -22,7 +22,7 @@ export default class Manage extends SfdxCommand {
   protected static flagsConfig = {
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
     updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription'), exclusive: ['updatetolatest'] }),
-    updatetolatest: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToNonPinnedDescription'), exclusive: ['updatetoreleased']})
+    updatetolatest: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToLatestDescription'), exclusive: ['updatetoreleased']})
   };
 
   // Comment this out if your command does not require an org username
@@ -39,7 +39,7 @@ export default class Manage extends SfdxCommand {
 
   public async run(): Promise<any> { // tslint:disable-line:no-any
 
-    const isInteractiveMode = !this.flags.updatetoreleased && !this.flags.updatetononpinned;
+    const isInteractiveMode = !this.flags.updatetoreleased && !this.flags.updatetolatest;
 
     // if (this.flags.json && isInteractiveMode) {
     //   this.error("'--json' flag is not allowed in conjuection ");
@@ -55,6 +55,19 @@ export default class Manage extends SfdxCommand {
 
     // const packageDependencyChangeSet = [];
     const packageDependencyChangeMap: Map<string, ProjectDependencyChange[]> = new Map<string, ProjectDependencyChange[]>();
+
+    const projectJson = await this.project.retrieveSfdxProjectJson();
+    const dependenciesToIgnore = _.get(projectJson['contents'], 'plugins.toolbox.dependencies.ignore', false) as string[];
+
+    console.log('dependenciesToIgnore');
+    console.log(dependenciesToIgnore);
+    console.log(dependenciesToIgnore !== undefined );
+    console.log(dependenciesToIgnore[0]);
+    console.log(dependenciesToIgnore.includes('blue'));
+    console.log(dependenciesToIgnore.includes('reference-force-di'));
+
+    console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-di', false) as string);
+    console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-i', false) as string);
 
     // Step 1D: for each dependency, prep choices
     // theSfdxProject.getProjectDependencies().forEach(async (element: ProjectPackageDirectoryDependency) => {
@@ -94,17 +107,33 @@ export default class Manage extends SfdxCommand {
             this.ux.log(messages.getMessage('messageReviewingOptionsForPackageDependency', [dependencyDisplayName]));
             // console.log('mark 1');
 
+            let theOriginalVersionAlias = theDevHubDependencies.getAlias() ;
+
+            if ( !theOriginalVersionAlias ) {
+              theOriginalVersionAlias = theSfdxProject.findAliasForProjectDependency(element);
+            }
+
             const dependencyPackageDisplayName = theSfdxProject.getDependencyPackageDisplayName(theDevHubDependencies.getPackage2IDForCurrentDependency());
+            // console.log(dependencyPackageDisplayName); // reference-force-di (0Ho1T000000PAshSAG)
+
+            // console.log(theDevHubDependencies.getPackage2IDForCurrentDependency());
+            // console.log(theDevHubDependencies.findAliasForPackage2Id(theDevHubDependencies.getPackage2IDForCurrentDependency()));
+
+            // should this dependency be skipped?
+            const isDependencyIgnored = dependenciesToIgnore.includes(theDevHubDependencies.getPackage2IDForCurrentDependency())
+                                          || dependenciesToIgnore.includes(theDevHubDependencies.findAliasForPackage2Id(theDevHubDependencies.getPackage2IDForCurrentDependency()));
 
             // console.log('mark 2');
             let dependencyPackageChoices;
 
-            if (isInteractiveMode) {
+            if ( isDependencyIgnored ) {
+              dependencyPackageChoices = theDevHubDependencies.prepareSameDependencyOptionForCurrentDependency();
+            } else if (isInteractiveMode) {
               dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
             } else {
               if ( this.flags.updatetoreleased ) {
                 dependencyPackageChoices = theDevHubDependencies.prepareRelatedReleasedDependencyOptionsForCurrentDependency();
-              } else if (this.flags.updatetononpinned) {
+              } else if (this.flags.updatetolatest) {
                 dependencyPackageChoices = theDevHubDependencies.prepareRelatedNonPinnedDependencyOptionsForCurrentDependency();
               }
             }
@@ -114,13 +143,8 @@ export default class Manage extends SfdxCommand {
             if (dependencyPackageChoices.length > 0) {
 
               let newDependencyAlias: string;
-              let theOriginalVersionAlias = theDevHubDependencies.getAlias() ;
 
-              if ( !theOriginalVersionAlias ) {
-                theOriginalVersionAlias = theSfdxProject.findAliasForProjectDependency(element);
-              }
-
-              if ( isInteractiveMode ) {
+              if ( isInteractiveMode && !isDependencyIgnored ) {
                 // tslint:disable-next-line: no-any
                 const packageVersionSelectionResponses: any = await inquirer.prompt([{
                   name: 'version',
@@ -152,8 +176,9 @@ export default class Manage extends SfdxCommand {
                                   , packageNonPinnedDependency);
                 }
               } else {
+                // not in interactive mode
                 const dependencyPackageChoice = dependencyPackageChoices[0];
-                console.log(dependencyPackageChoice);
+                // console.log(dependencyPackageChoice);
 
                 if ( dependencyPackageChoice.value
                   && (dependencyPackageChoice.value as string).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX) ) {
@@ -183,7 +208,12 @@ export default class Manage extends SfdxCommand {
               // console.log(aProjectDependencyChange);
               // console.log('***************************************************************************************************');
               this.ux.log('');
-              this.ux.log(`${dependencyPackageDisplayName} version selected: ${newDependencyAlias}`);
+
+              if ( isDependencyIgnored ) {
+                this.ux.log(`${dependencyPackageDisplayName} version is ignored`);
+              } else {
+                this.ux.log(`${dependencyPackageDisplayName} version selected: ${newDependencyAlias}`);
+              }
 
               packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
             } else {
@@ -271,6 +301,7 @@ export default class Manage extends SfdxCommand {
     const updatePackageDependencyList = async () => {
       packageDependencyChangeMap.forEach( async (packageDependencyChanges: ProjectDependencyChange[], packageDirectoryPath: string) => {
         await this.asyncForEach(packageDependencyChanges, async (element: ProjectDependencyChange) => {
+          // console.log(element);
           await theSfdxProject.changeToPackageVersion( element, packageDirectoryPath );
         });
       });
