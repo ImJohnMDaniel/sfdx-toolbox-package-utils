@@ -197,7 +197,17 @@ export class DevHubDependencies {
     private createNonPinnedSameMajorMinorPatchVersion(options: InquirerOption[]) {
         // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
 
-
+// when used, all dependencies that are owned by the current Dev Hub will be set to X.Y.Z.LATEST, unless the X.Y.Z version has been released
+//
+//
+//
+//
+// *********START HERE NOW****************
+//
+//
+//
+//
+//
 // How does this method ensure that the version requested doesn't have a released version
 //      from a later version.
 //      If you ask for 0.1.0.LATEST but there is a version 0.2.0.x that is released, then what should be returned?
@@ -205,7 +215,15 @@ export class DevHubDependencies {
 //          0.2.0.LATEST --- no, the 0.2.0 is already released
 //          0.3.0.LATEST --- probably
 
+        // find the latest released version
+        const latestReleaseOptions = [] as InquirerOption[];
+        this.findLatestBuildReleased(latestReleaseOptions);
+
+        // assemble the version number
         let versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber();
+
+        // the findBlock command works through the supplied devHubPackageVersionInfosByPackageAndBranchMap 
+        // this.currentPackageDependency.getMajorVersionNumber()
 
         // In this case, the branch really doesn't matter.  Just either supply the currentBranch or empty space
         let currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, this.currentBranch);
@@ -229,6 +247,16 @@ export class DevHubDependencies {
         }
         // console.log('createNonPinnedSameMajorMinorPatchVersion finishes');
     }
+
+
+
+
+
+
+
+
+
+
 
     private findLatestBuildSameMajorMinorVersion(options: InquirerOption[]) {
         if ( this.currentBranch ) {
