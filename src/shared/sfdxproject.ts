@@ -114,8 +114,21 @@ export class SfdxProjects {
         // this.sfdxProjectJson.getContents().packageDirectories[0].dependencies[0].package = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
         // this.sfdxProjectJson.getContents().packageDirectories[0].dependencies[0].versionNumber = undefined;
 
-        await this.sfdxProjectJson.write();
+        // console.log('************************************************************************************************');
+        // console.log('this.sfdxProjectJson.getContents()');
+        // console.log(this.sfdxProjectJson.getContents());
+        // console.log('************************************************************************************************');
+        // console.log('this.sfdxProjectJson.getContents().packageDirectories');
+        // console.log(this.sfdxProjectJson.getContents().packageDirectories);
+        // console.log('************************************************************************************************');
+        // console.log(this.sfdxProjectJson.getContents().packageDirectories[0].dependencies);
+        // console.log('************************************************************************************************');
+        await this.sfdxProjectJson.write(this.sfdxProjectJson.getContents());
+        // await this.sfdxProjectJson.writeSync();
         // console.log('write occurs here');
+        // console.log('************************************************************************************************');
+        // console.log('this.sfdxProjectJson.getContents()');
+        // console.log(this.sfdxProjectJson.getContents());
         // console.log('************************************************************************************************');
         // console.log(this.sfdxProjectJson.getContents().packageDirectories);
         // console.log('************************************************************************************************');

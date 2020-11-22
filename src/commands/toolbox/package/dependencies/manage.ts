@@ -57,17 +57,27 @@ export default class Manage extends SfdxCommand {
     const packageDependencyChangeMap: Map<string, ProjectDependencyChange[]> = new Map<string, ProjectDependencyChange[]>();
 
     const projectJson = await this.project.retrieveSfdxProjectJson();
-    const dependenciesToIgnore = _.get(projectJson['contents'], 'plugins.toolbox.dependencies.ignore', false) as string[];
+    let dependenciesToIgnore = _.get(projectJson['contents'], 'plugins.toolbox.dependencies.ignore', false) as string[];
 
-    console.log('dependenciesToIgnore');
-    console.log(dependenciesToIgnore);
-    console.log(dependenciesToIgnore !== undefined );
-    console.log(dependenciesToIgnore[0]);
-    console.log(dependenciesToIgnore.includes('blue'));
-    console.log(dependenciesToIgnore.includes('reference-force-di'));
+    // console.log('dependenciesToIgnore-1');
+    // console.log(dependenciesToIgnore);
+    // console.log('dependenciesToIgnore-2');
+    // if ( !dependenciesToIgnore ) {
+    //   dependenciesToIgnore = [];
+    //   console.log('dependenciesToIgnore re-initialized as empty array');
+    //   console.log(dependenciesToIgnore);
+    // }
 
-    console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-di', false) as string);
-    console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-i', false) as string);
+    // console.log('dependenciesToIgnore-3');
+    // console.log(dependenciesToIgnore[0]);
+    // console.log('dependenciesToIgnore-4');
+    // console.log(dependenciesToIgnore.includes('blue'));
+    // console.log('dependenciesToIgnore-5');
+    // console.log(dependenciesToIgnore.includes('reference-force-di'));
+    // console.log('dependenciesToIgnore-6');  
+
+    // console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-di', false) as string);
+    // console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-i', false) as string);
 
     // Step 1D: for each dependency, prep choices
     // theSfdxProject.getProjectDependencies().forEach(async (element: ProjectPackageDirectoryDependency) => {
@@ -120,8 +130,11 @@ export default class Manage extends SfdxCommand {
             // console.log(theDevHubDependencies.findAliasForPackage2Id(theDevHubDependencies.getPackage2IDForCurrentDependency()));
 
             // should this dependency be skipped?
-            const isDependencyIgnored = dependenciesToIgnore.includes(theDevHubDependencies.getPackage2IDForCurrentDependency())
-                                          || dependenciesToIgnore.includes(theDevHubDependencies.findAliasForPackage2Id(theDevHubDependencies.getPackage2IDForCurrentDependency()));
+            const isDependencyIgnored = ( dependenciesToIgnore
+                                          && (dependenciesToIgnore.includes(theDevHubDependencies.getPackage2IDForCurrentDependency())
+                                              || dependenciesToIgnore.includes(theDevHubDependencies.findAliasForPackage2Id(theDevHubDependencies.getPackage2IDForCurrentDependency()))
+                                             )
+                                        );
 
             // console.log('mark 2');
             let dependencyPackageChoices;
