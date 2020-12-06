@@ -4,6 +4,8 @@ import * as _ from 'lodash';
 import { Constants } from '../../../../shared/constants';
 import { DevHubDependencies } from '../../../../shared/devHub';
 import { SfdxProjects } from '../../../../shared/sfdxproject';
+import { Utils } from '../../../../shared/utils';
+import { InquirerOption } from '../../../../types/inquirer_option';
 import { ProjectDependencyChange } from '../../../../types/project_dependency_change';
 import { ProjectPackageDirectoryDependency } from '../../../../types/project_package_directory_dependency';
 
@@ -123,7 +125,14 @@ export default class Manage extends SfdxCommand {
               theOriginalVersionAlias = theSfdxProject.findAliasForProjectDependency(element);
             }
 
-            const dependencyPackageDisplayName = theSfdxProject.getDependencyPackageDisplayName(theDevHubDependencies.getPackage2IDForCurrentDependency());
+            const package2Id = theDevHubDependencies.getPackage2IDForCurrentDependency();
+            let dependencyPackageDisplayName: string;
+            dependencyPackageDisplayName = theSfdxProject.getDependencyPackageDisplayName(package2Id);
+            if ( dependencyPackageDisplayName === package2Id) {
+              // the package2 alias was not found in the sfdx-project.json file.
+              // Use the DevHub to get the package alias instead.
+              dependencyPackageDisplayName = Utils.createDependencyPackageDisplayName(package2Id, theDevHubDependencies.findAliasForPackage2Id(package2Id));
+            }
             // console.log(dependencyPackageDisplayName); // reference-force-di (0Ho1T000000PAshSAG)
 
             // console.log(theDevHubDependencies.getPackage2IDForCurrentDependency());
@@ -137,7 +146,7 @@ export default class Manage extends SfdxCommand {
                                         );
 
             // console.log('mark 2');
-            let dependencyPackageChoices;
+            let dependencyPackageChoices = [] as InquirerOption[];
 
             if ( isDependencyIgnored ) {
               dependencyPackageChoices = theDevHubDependencies.prepareSameDependencyOptionForCurrentDependency();
@@ -236,13 +245,10 @@ export default class Manage extends SfdxCommand {
             // state that this dependency is not managed by the DevHub and will be by-passed.
             this.ux.log(messages.getMessage('messagePackageDependencyNotManagedByDevHub', [dependencyDisplayName]));
 
-// TODO - put a change here but with the same values ~~~~~~~~~~
-            
             aProjectDependencyChange = new ProjectDependencyChange()
                                                 .setOldVersion( theSfdxProject.findAliasForProjectDependency(element), element )
                                                 .setNewVersionToOldVersion();
             packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
-// packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
 
           }
           // if (devHubPackageVersionInfosBySubscriberPackageVersionMap.has(element.packageVersionId)) {
@@ -324,7 +330,7 @@ export default class Manage extends SfdxCommand {
       packageDependencyChangeMap.forEach( async (packageDependencyChanges: ProjectDependencyChange[], packageDirectoryPath: string) => {
         await this.asyncForEach(packageDependencyChanges, async (element: ProjectDependencyChange) => {
           // console.log(element);
-          await theSfdxProject.changeToPackageVersion( element, packageDirectoryPath );
+          await theSfdxProject.changeToPackageVersion( element, packageDirectoryPath, theDevHubDependencies );
         });
       });
     };

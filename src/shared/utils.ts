@@ -38,4 +38,8 @@ export class Utils {
 
         return newDevHubPackageVersion;
     }
+
+    public static createDependencyPackageDisplayName( package2Id: string, packageAlias?: string): string {
+        return packageAlias ? packageAlias + ' (' + package2Id + ')' : package2Id;
+    }
 }

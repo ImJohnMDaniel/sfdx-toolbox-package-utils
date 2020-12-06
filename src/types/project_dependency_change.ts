@@ -51,6 +51,10 @@ export class ProjectDependencyChange {
         return this;
     }
 
+    public newVersionIsTheSameAsTheOldVersion(): void {
+        this.isNewVersionClonedFromOldVersion = true;
+    }
+
     public isPinned(): boolean {
         return this.newPackageNonPinnedDependency === undefined;
     }

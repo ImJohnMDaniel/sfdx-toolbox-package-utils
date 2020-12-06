@@ -71,7 +71,7 @@ export class DevHubDependencies {
 
     public prepareRelatedReleasedDependencyOptionsForCurrentDependency(): InquirerOption[] {
         const options: InquirerOption[] = [];
-        this.findLatestBuildReleased(options);
+        this.findLatestBuildReleased(options, true);
         return options;
     }
 
@@ -82,29 +82,33 @@ export class DevHubDependencies {
     }
 
     public prepareRelatedDependencyOptionsForCurrentDependency(): InquirerOption[] {
-        // Is there a released version that is available on the main branch?
-        // Is there a newer version that is available on this currentPackageVersionBlock?
-        // Is there a newer Major.Minor version availble?
-        // Is there a newer Major version available?
+        // TODO: implement "Is there a newer Major version available?"
         // There is a distinction between "next available version" and "next avaialble released version"
         // There is a distinction between "the base/null branch" verses the "feature branch" that is coming from Branch flag
         const options: InquirerOption[] = [];
 
         this.logger('mark 2A');
         this.logger(options.length);
+        // Is there a newer version that is available on this currentPackageVersionBlock?
+        // Is there a newer Major.Minor version availble?
         this.findLatestBuildSameMajorMinorVersion(options);
         this.logger('mark 2B');
         this.logger(options.length);
+        // Is there a released version that is available on the main branch?
         this.findLatestMainBranchBuildVersion(options);
         this.logger('mark 2C');
         this.logger(options.length);
+        // What is the latest build version on the branch regardless of Major.Minor.Patch numbers?
         this.findLatestCurrentBranchBuilderVersion(options);
         this.logger('mark 2D');
         this.logger(options.length);
-        this.findLatestBuildReleased(options);
+        // Is there a released version that is available on the main branch?
+        this.findLatestBuildReleased(options, true);
         this.logger('mark 2E');
+        // Create "package@CurrentMajor.CurrentMinor.CurrentPatch-LATEST" version entry
         this.createNonPinnedSameMajorMinorPatchVersion(options);
         this.logger('mark 2F');
+        // Create an option to keep the current version specified in the sfdx-project.json
         this.createSameOptionAsCurrent(options);
         this.logger(options.length);
 
@@ -154,26 +158,6 @@ export class DevHubDependencies {
                         : undefined;
     }
 
-    // private createAliasForPackage(aPackage: DevHubPackage): string {
-    //     return (aPackage.NamespacePrefix ? (aPackage.NamespacePrefix + '.') : '')
-    //                 + aPackage.Name;
-    // }
-
-    // private createAliasForPackageVersion(packageVersion: DevHubPackageVersion ): string {
-    //     return (packageVersion.NamespacePrefix ? (packageVersion.NamespacePrefix + '.') : '')
-    //                 + packageVersion.Package2Name + '@'
-    //                 + this.createVersionAliasSegment(packageVersion);
-    // }
-
-    // private createVersionAliasSegment(packageVersion: DevHubPackageVersion ): string {
-    //     return this.createVersionAliasSegmentString( packageVersion.Version, packageVersion.Branch );
-    // }
-
-    // private createVersionAliasSegmentString(version: string, branch?: string) {
-    //     const versionNumbers = version.split('.');
-    //     return versionNumbers[0] + '.' + versionNumbers[1] + '.' + versionNumbers[2] + '-' + versionNumbers[3] + (branch ? '-' + branch : '');
-    // }
-
     private createOptionBySubscriberPackageVersionId(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
         const option = new InquirerOption();
         option.value = packageVersion.SubscriberPackageVersionId;
@@ -198,34 +182,27 @@ export class DevHubDependencies {
     private createSameOptionAsCurrent(options: InquirerOption[]) {
         // add the current version to allow for no change
         if ( this.currentPackageDependency.getSubscriberPackageVersionId() ) {
-            options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()), 'Current version specified', this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
+            options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId())
+                                                                        , 'Current version specified'
+                                                                        , this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
         }
     }
 
+    /*
+     *  when used, all dependencies that are owned by the current Dev Hub will be set to X.Y.Z.LATEST, unless the X.Y.Z version has been released
+     *  How does this method ensure that the version requested doesn't have a released version
+     *      from a later version.
+     *      If you ask for 0.1.0.LATEST but there is a version 0.2.0.x that is released, then what should be returned?
+     *          0.1.0.LATEST --- no
+     *          0.2.0.LATEST --- no, the 0.2.0 is already released
+     *          0.3.0.LATEST --- probably
+     */
     private createNonPinnedSameMajorMinorPatchVersion(options: InquirerOption[]) {
         // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
 
-// when used, all dependencies that are owned by the current Dev Hub will be set to X.Y.Z.LATEST, unless the X.Y.Z version has been released
-//
-//
-//
-//
-// *********START HERE NOW****************
-//
-//
-//
-//
-//
-// How does this method ensure that the version requested doesn't have a released version
-//      from a later version.
-//      If you ask for 0.1.0.LATEST but there is a version 0.2.0.x that is released, then what should be returned?
-//          0.1.0.LATEST --- no
-//          0.2.0.LATEST --- no, the 0.2.0 is already released
-//          0.3.0.LATEST --- probably
-
         // find the latest released version
         const latestReleaseOptions = [] as InquirerOption[];
-        this.findLatestBuildReleased(latestReleaseOptions);
+        this.findLatestBuildReleased(latestReleaseOptions, false);
 
         // assemble the version number
         let versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber();
@@ -251,20 +228,10 @@ export class DevHubDependencies {
         if (currentBuildBlock) {
             options.push(this.createOptionByPackage2Id(this.findLatestBuildFromBlock(currentBuildBlock), 'Non-pinned latest ' + versionNumber + ' build'));
         } else {
-            this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
+            this.ux.log('    -- No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
         }
         // console.log('createNonPinnedSameMajorMinorPatchVersion finishes');
     }
-
-
-
-
-
-
-
-
-
-
 
     private findLatestBuildSameMajorMinorVersion(options: InquirerOption[]) {
         if ( this.currentBranch ) {
@@ -273,7 +240,7 @@ export class DevHubDependencies {
             if (currentBuildBlock) {
                 options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on \'' + this.currentBranch + '\' branch', this.currentBranch));
             } else {
-                this.ux.log('No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
+                this.ux.log('    -- No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
             }
         }
     }
@@ -284,7 +251,7 @@ export class DevHubDependencies {
         if (currentBuildBlock) {
             options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on main build branch', undefined));
         } else {
-            this.ux.log('No option found for latest build on the main build branch');
+            this.ux.log('    -- No option found for latest build on the main build branch');
         }
     }
 
@@ -295,18 +262,20 @@ export class DevHubDependencies {
             if (currentBuildBlock) {
                 options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest version on \'' + this.currentBranch + '\' branch', this.currentBranch));
             } else {
-                this.ux.log('No option found for latest build on branch : ' + this.currentBranch);
+                this.ux.log('    -- No option found for latest build on branch : ' + this.currentBranch);
             }
         }
     }
 
-    private findLatestBuildReleased(options: InquirerOption[]) {
+    private findLatestBuildReleased(options: InquirerOption[], isLoggingToUX?: boolean) {
         const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosReleasedByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
 
         if (currentBuildBlock) {
             options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest released version on main build branch', undefined));
         } else {
-            this.ux.log('No option found for released version build on main build branch');
+            if ( isLoggingToUX ) {
+                this.ux.log('    -- No option found for released version build on main build branch');
+            }
         }
     }
 

@@ -4,6 +4,9 @@ import { AnyJson, JsonArray, JsonMap } from '@salesforce/ts-types';
 import * as _ from 'lodash';
 import { ProjectDependencyChange } from '../types/project_dependency_change';
 import { ProjectPackageDirectoryDependency } from '../types/project_package_directory_dependency';
+import { Constants } from './constants';
+import { DevHubDependencies } from './devHub';
+import { Utils } from './utils';
 
 /*
  *  This class wraps the sfdx-project.json file with various convenience functions.
@@ -22,7 +25,7 @@ export class SfdxProjects {
         this.sfdxProjectJson = sfdxProjectJson;
     }
 
-    public async changeToPackageVersion( dependencyChange: ProjectDependencyChange, packageDirectoryPath: string ) {
+    public async changeToPackageVersion( dependencyChange: ProjectDependencyChange, packageDirectoryPath: string, theDevHubDependencies: DevHubDependencies ) {
 
         // console.log('************************************************************************************************');
         // console.log(this.sfdxProjectJson);
@@ -101,9 +104,23 @@ export class SfdxProjects {
                                 }
                             }
 
-                            // add the alias
+                            // add package alias, if not already present
+                            if ( dependencyChange.getNewVersionDependency() !== undefined ) {
+                                const newDependencyPackageAlias = theDevHubDependencies.findAliasForPackage2Id(dependencyChange.getNewVersionDependency().Package2Id);
+                                // console.log('newDependencyPackageAlias == ' + newDependencyPackageAlias);
+                                if ( newDependencyPackageAlias != undefined && this.sfdxProjectJson.getContents().packageAliases[newDependencyPackageAlias] == undefined ) {
+                                    // console.log('newDependencyPackageAlias was not defined currently in aliases section.  Adding ' + newDependencyPackageAlias);
+                                    this.sfdxProjectJson.getContents().packageAliases[newDependencyPackageAlias] = dependencyChange.getNewVersionDependency().Package2Id;
+                                }
+                            }
+
+                            // remove the old alias if it is different than the new AND it is a package version (aka '04t') alias
+                            // keep the package (aka '0Ho') aliases
                             if (dependencyChange.getOldVersionAlias() !== dependencyChange.getNewVersionAlias()) {
-                                this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getOldVersionAlias()] = undefined;
+                                if ( this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getOldVersionAlias()] !== undefined 
+                                    && Constants.isPackageVersionId(this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getOldVersionAlias()])) {
+                                        this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getOldVersionAlias()] = undefined;
+                                } 
                             }
                         }
                     });
@@ -174,7 +191,7 @@ export class SfdxProjects {
     public getDependencyPackageDisplayName( package2Id: string ) {
         const dependencyPackageAlias = this.findAlias( package2Id );
 
-        return dependencyPackageAlias ? dependencyPackageAlias + ' (' + package2Id + ')' : package2Id;
+        return Utils.createDependencyPackageDisplayName(package2Id, dependencyPackageAlias);
     }
 
     public getDependencyDisplayName(projectDependency: ProjectPackageDirectoryDependency) {
