@@ -235,6 +235,15 @@ export default class Manage extends SfdxCommand {
           } else {
             // state that this dependency is not managed by the DevHub and will be by-passed.
             this.ux.log(messages.getMessage('messagePackageDependencyNotManagedByDevHub', [dependencyDisplayName]));
+
+// TODO - put a change here but with the same values ~~~~~~~~~~
+            
+            aProjectDependencyChange = new ProjectDependencyChange()
+                                                .setOldVersion( theSfdxProject.findAliasForProjectDependency(element), element )
+                                                .setNewVersionToOldVersion();
+            packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
+// packageDependencyChangeMap.get(packageDirectoryPath).push(aProjectDependencyChange);
+
           }
           // if (devHubPackageVersionInfosBySubscriberPackageVersionMap.has(element.packageVersionId)) {
           // console.log('taking action');

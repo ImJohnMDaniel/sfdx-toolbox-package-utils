@@ -81,7 +81,9 @@ export class SfdxProjects {
                                 // add the alias
                                 this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
 
-                                console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
+                                if( ! dependencyChange.isNewVersionTheSameAsTheOldVersion() ) {
+                                    console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
+                                }
 
                             } else {
                                 // this is a non-pinned, snapshot version
@@ -94,7 +96,9 @@ export class SfdxProjects {
                                 // add the alias
                                 this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewPackageNonPinnedDependency().getPackage2Id();
 
-                                console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() + '@' + dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber() );
+                                if( ! dependencyChange.isNewVersionTheSameAsTheOldVersion() ) {
+                                    console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() + '@' + dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber() );
+                                }
                             }
 
                             // add the alias

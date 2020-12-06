@@ -5,6 +5,7 @@ import { DevHubPackageVersion } from '../types/devhub_package_version';
 import { InquirerOption } from '../types/inquirer_option';
 import { ProjectPackageDirectoryDependency } from '../types/project_package_directory_dependency';
 import forcePackageCommand = require('./forceCommands/force_package');
+import { Utils } from './utils';
 
 export class DevHubDependencies {
 
@@ -111,7 +112,10 @@ export class DevHubDependencies {
     }
 
     public getAlias(): string {
-        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ? this.createAliasForPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ) : undefined;
+        return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) 
+                        // ? this.createAliasForPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ) 
+                        ? Utils.createAliasForPackageVersionFromDevHubPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()) ) 
+                        : undefined;
     }
 
     /**
@@ -132,13 +136,15 @@ export class DevHubDependencies {
 
     public findAliasForSubscriberPackageVersionId(subscriberPackageVersionId: string): string {
         return this.devHubPackageVersionInfosBySubscriberPackageVersionMap.has(subscriberPackageVersionId)
-                        ? this.createAliasForPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId) )
+                        // ? this.createAliasForPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId) )
+                        ? Utils.createAliasForPackageVersionFromDevHubPackageVersion( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(subscriberPackageVersionId) )
                         : undefined;
     }
 
     public findAliasForPackage2Id(package2Id: string): string {
         return this.devHubPackageInfosBySubscriberPackageMap.has(package2Id)
-                        ? this.createAliasForPackage( this.devHubPackageInfosBySubscriberPackageMap.get(package2Id) )
+                        // ? this.createAliasForPackage( this.devHubPackageInfosBySubscriberPackageMap.get(package2Id) )
+                        ? Utils.createAliasForPackageFromDevHubPackage( this.devHubPackageInfosBySubscriberPackageMap.get(package2Id) )
                         : undefined;
     }
 
@@ -148,31 +154,33 @@ export class DevHubDependencies {
                         : undefined;
     }
 
-    private createAliasForPackage(aPackage: DevHubPackage): string {
-        return (aPackage.NamespacePrefix ? (aPackage.NamespacePrefix + '.') : '')
-                    + aPackage.Name;
-    }
+    // private createAliasForPackage(aPackage: DevHubPackage): string {
+    //     return (aPackage.NamespacePrefix ? (aPackage.NamespacePrefix + '.') : '')
+    //                 + aPackage.Name;
+    // }
 
-    private createAliasForPackageVersion(packageVersion: DevHubPackageVersion ): string {
-        return (packageVersion.NamespacePrefix ? (packageVersion.NamespacePrefix + '.') : '')
-                    + packageVersion.Package2Name + '@'
-                    + this.createVersionAliasSegment(packageVersion);
-    }
+    // private createAliasForPackageVersion(packageVersion: DevHubPackageVersion ): string {
+    //     return (packageVersion.NamespacePrefix ? (packageVersion.NamespacePrefix + '.') : '')
+    //                 + packageVersion.Package2Name + '@'
+    //                 + this.createVersionAliasSegment(packageVersion);
+    // }
 
-    private createVersionAliasSegment(packageVersion: DevHubPackageVersion ): string {
-        return this.createVersionAliasSegmentString( packageVersion.Version, packageVersion.Branch );
-    }
+    // private createVersionAliasSegment(packageVersion: DevHubPackageVersion ): string {
+    //     return this.createVersionAliasSegmentString( packageVersion.Version, packageVersion.Branch );
+    // }
 
-    private createVersionAliasSegmentString(version: string, branch?: string) {
-        const versionNumbers = version.split('.');
-        return versionNumbers[0] + '.' + versionNumbers[1] + '.' + versionNumbers[2] + '-' + versionNumbers[3] + (branch ? '-' + branch : '');
-    }
+    // private createVersionAliasSegmentString(version: string, branch?: string) {
+    //     const versionNumbers = version.split('.');
+    //     return versionNumbers[0] + '.' + versionNumbers[1] + '.' + versionNumbers[2] + '-' + versionNumbers[3] + (branch ? '-' + branch : '');
+    // }
 
     private createOptionBySubscriberPackageVersionId(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
         const option = new InquirerOption();
         option.value = packageVersion.SubscriberPackageVersionId;
-        option.short = this.createVersionAliasSegmentString( packageVersion.Version, branchText );
-        option.name = extraNameText + ': ' + this.createVersionAliasSegment(packageVersion);
+        // option.short = this.createVersionAliasSegmentString( packageVersion.Version, branchText );
+        // option.name = extraNameText + ': ' + this.createVersionAliasSegment(packageVersion);
+        option.short = Utils.createVersionAliasSegmentString(packageVersion.Version, branchText );
+        option.name = extraNameText + ': ' + Utils.createVersionAliasSegment(packageVersion);
         return option;
     }
 
