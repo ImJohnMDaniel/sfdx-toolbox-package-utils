@@ -51,7 +51,7 @@ export default class Manage extends SfdxCommand {
     // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
     // const conn = this.org.getConnection();
 
-    const theSfdxProject = await SfdxProjects.getInstance(this.project);
+    const theSfdxProject = await SfdxProjects.getInstance(this.project, this.ux);
 
     const theDevHubDependencies = await DevHubDependencies.getInstance(this.hubOrg, this.ux);
 
@@ -325,6 +325,13 @@ export default class Manage extends SfdxCommand {
 
     // console.log('************************************************************************************************');
     // console.log('packageDependencyChangeMap');
+    // console.log(packageDependencyChangeMap);
+    // console.log('************************************************************************************************');
+    // create a deep clone of the packageDependencyChangeMap for later JSON output
+    // const packageDependencyChangeMapForOutput = packageDependencyChangeMap;
+    // console.log('************************************************************************************************');
+    // console.log('packageDependencyChangeMapForOutput');
+    // console.log(packageDependencyChangeMapForOutput);
     // console.log('************************************************************************************************');
     const updatePackageDependencyList = async () => {
       packageDependencyChangeMap.forEach( async (packageDependencyChanges: ProjectDependencyChange[], packageDirectoryPath: string) => {
@@ -336,8 +343,15 @@ export default class Manage extends SfdxCommand {
     };
 
     await updatePackageDependencyList();
-
-    return;
+    // console.log('************************************************************************************************');
+    // console.log('packageDependencyChangeMap at the end');
+    // console.log(packageDependencyChangeMap);
+    // console.log('************************************************************************************************');
+    // console.log('************************************************************************************************');
+    // console.log('packageDependencyChangeMapForOutput at the end');
+    // console.log(packageDependencyChangeMapForOutput);
+    // console.log('************************************************************************************************');
+    return this.convertPackageDependencyChangeMapToJson(packageDependencyChangeMap);
   }
 
   // TODO: Can this function be replaced by core.SfdxProjectJson.awaitEach() method?
@@ -345,6 +359,22 @@ export default class Manage extends SfdxCommand {
     for (let index = 0; index < array.length; index++) {
       await callback(array[index], index, array);
     }
+  }
+
+  private convertPackageDependencyChangeMapToJson(packageDependencyChangeMap: Map<string, ProjectDependencyChange[]>): string {
+    let jsonRepresentation = {} as string;
+
+    packageDependencyChangeMap.forEach((values, key) => {
+      // let valueAsProjectDependencyChange: ProjectDependencyChange;
+      // valueAsProjectDependencyChange = value;
+      jsonRepresentation[key] = [];
+
+      values.forEach( (projDepChng: ProjectDependencyChange) => {
+        jsonRepresentation[key].push( projDepChng.toJson() );
+      });
+    });
+
+    return jsonRepresentation;
   }
 
 }

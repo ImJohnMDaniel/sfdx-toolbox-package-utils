@@ -69,6 +69,18 @@ export class ProjectDependencyChange {
         return this;
     }
 
+    public toJson(): string {
+        let jsonRepresentation = {} as string;
+
+        jsonRepresentation['newVersionAlias'] = this.newVersionAlias;
+        jsonRepresentation['newVersionDependency'] = this.newVersionDependency;
+        jsonRepresentation['newPackageNonPinnedDependency'] = this.newPackageNonPinnedDependency;
+        jsonRepresentation['oldVersionAlias'] = this.oldVersionAlias;
+        jsonRepresentation['oldVersionDependency'] = this.oldVersionDependency;
+        jsonRepresentation['isNewVersionClonedFromOldVersion'] = this.isNewVersionClonedFromOldVersion;
+
+        return jsonRepresentation;
+    }
     private setupNewVersionWithOldVersionInfo(): void {
         if ( this.isNewVersionClonedFromOldVersion 
                 && this.isOldVersionSet 
@@ -80,4 +92,5 @@ export class ProjectDependencyChange {
             this.isNewVersionClonedFromOldVersion = true;
         }
     }
+
 }

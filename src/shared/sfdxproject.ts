@@ -1,4 +1,4 @@
-import { core } from '@salesforce/command';
+import { core, UX } from '@salesforce/command';
 import { PackageDir, PackageDirDependency } from '@salesforce/core/lib/sfdxProject';
 import { AnyJson, JsonArray, JsonMap } from '@salesforce/ts-types';
 import * as _ from 'lodash';
@@ -13,16 +13,18 @@ import { Utils } from './utils';
  */
 export class SfdxProjects {
 
-    public static async getInstance( sfdxProject: core.SfdxProject ) {
+    public static async getInstance( sfdxProject: core.SfdxProject, thisUx: UX ) {
         const sfdxProjectJson = await sfdxProject.retrieveSfdxProjectJson();
 
-        return new SfdxProjects(sfdxProjectJson);
+        return new SfdxProjects(sfdxProjectJson, thisUx);
     }
 
     private sfdxProjectJson: core.SfdxProjectJson;
+    private ux: UX;
 
-    private constructor( sfdxProjectJson: core.SfdxProjectJson ) {
+    private constructor( sfdxProjectJson: core.SfdxProjectJson, thisUx: UX ) {
         this.sfdxProjectJson = sfdxProjectJson;
+        this.ux = thisUx;
     }
 
     public async changeToPackageVersion( dependencyChange: ProjectDependencyChange, packageDirectoryPath: string, theDevHubDependencies: DevHubDependencies ) {
@@ -85,7 +87,8 @@ export class SfdxProjects {
                                 this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewVersionDependency().SubscriberPackageVersionId;
 
                                 if( ! dependencyChange.isNewVersionTheSameAsTheOldVersion() ) {
-                                    console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
+                                    this.ux.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() );
+                                    // this.ux.logJson(dependencyChange);
                                 }
 
                             } else {
@@ -100,7 +103,8 @@ export class SfdxProjects {
                                 this.sfdxProjectJson.getContents().packageAliases[dependencyChange.getNewVersionAlias()] = dependencyChange.getNewPackageNonPinnedDependency().getPackage2Id();
 
                                 if( ! dependencyChange.isNewVersionTheSameAsTheOldVersion() ) {
-                                    console.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() + '@' + dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber() );
+                                    this.ux.log('Changing out ' + dependencyChange.getOldVersionAlias() + ' for ' + dependencyChange.getNewVersionAlias() + '@' + dependencyChange.getNewPackageNonPinnedDependency().getVersionNumber() );
+                                    // this.ux.logJson(dependencyChange);
                                 }
                             }
 
