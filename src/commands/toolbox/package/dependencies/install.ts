@@ -43,16 +43,35 @@ export default class Install extends SfdxCommand {
   // Set this to true if your command requires a project workspace; 'requiresProject' is false by default
   protected static requiresProject = true;
 
+  private processMessage( debugMessage: any): void {
+    if ( debugMessage !== undefined ) {
+      this.debug( 'DEBUG ' + debugMessage);
+    }    
+  }
+  private processMessages( debugMessages: any[]): void {
+    if ( debugMessages !== undefined ) {
+      for( let aMessage of debugMessages ){
+        this.processMessage(aMessage);
+      }
+    }
+  }
+
   public async run(): Promise<any> { // tslint:disable-line:no-any
 
     const packagesInstalled = {};
     const packagesNotInstalled = {};
 
-    const packageVersionsAlreadyInstalled = this.flags.noprecheck ? undefined : await forcePackageCommand.retrievePackagesCurrentlyInstalled(this.org, this.ux);
+    this.processMessage('install.run method -- before call to forcePackageCommand.retrievePackagesCurrentlyInstalled');
+    const debugMessages = [];
+    const packageVersionsAlreadyInstalled = this.flags.noprecheck ? undefined : await forcePackageCommand.retrievePackagesCurrentlyInstalled(this.org, this.ux, debugMessages);
+    this.processMessages(debugMessages);
+    this.processMessage('install.run method -- after call to forcePackageCommand.retrievePackagesCurrentlyInstalled');
 
     // Getting Project config
     this.ux.startSpinner('Processing sfdx-project.json file');
+    this.processMessage('before call to this.project.retrieveSfdxProjectJson()');
     const projectJson = await this.project.retrieveSfdxProjectJson();
+    this.processMessage('after call to this.project.retrieveSfdxProjectJson()');
 
     // Getting a list of alias
     const packageAliases = _.get(projectJson['contents'], 'packageAliases');

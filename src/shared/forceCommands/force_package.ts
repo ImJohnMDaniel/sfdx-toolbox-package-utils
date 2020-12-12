@@ -1,4 +1,4 @@
-import { UX } from '@salesforce/command';
+import { SfdxCommand, UX } from '@salesforce/command';
 import { Org } from '@salesforce/core';
 import * as _ from 'lodash';
 import { PackageInstalledListCommand } from 'salesforce-alm/dist/commands/force/package/installed/list';
@@ -8,8 +8,10 @@ import { DevHubPackage } from '../../types/devhub_package';
 import { DevHubPackageVersion } from '../../types/devhub_package_version';
 import { SubscriberInstalledPackageVersion } from '../../types/subscriber_installed_package_version';
 
-export async function retrievePackagesCurrentlyInstalled( thisOrg: Org, thisUx: UX ) {
+// export async function retrievePackagesCurrentlyInstalled( thisOrg: Org, thisUx: UX ) {
+export async function retrievePackagesCurrentlyInstalled( thisOrg: Org, thisUx: UX, thisDebugMessages: any[] ) {
 
+    thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- starts');
     thisUx.startSpinner('Retrieving packages currently installed in org....');
 
     // execute the force:package:installed:list command
@@ -26,25 +28,64 @@ export async function retrievePackagesCurrentlyInstalled( thisOrg: Org, thisUx: 
     args.push('--loglevel');
     args.push('debug');
 
+    thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- prior to creation of intercept');
     const intercept = require('intercept-stdout');
 
+    thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- prior to execution of intercept');
     // tslint:disable-next-line: only-arrow-functions
     const unhookIntercept = intercept(function(text) {
         // logs.push(text);
         return '';
     });
 
-    let installedPackageListJson = await PackageInstalledListCommand.run( args );
+    thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- prior to first execution of PackageInstalledListCommand.run');
+
+    let installedPackageListJson = undefined
+
+    try {
+        installedPackageListJson = await PackageInstalledListCommand.run( args );
+        thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- after first execution of PackageInstalledListCommand.run');
+    } catch (e) {
+        if(e instanceof Error) {
+            let theError = (e as Error);
+            thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- name: ' + theError.name);
+            thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- message: ' + theError.message);
+            thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- stack: ' + theError.stack);
+        }
+        else {
+            thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- unknown error : ' + e);
+            throw e;
+        }
+    }
+    
+    thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- installedPackageListJson is undefined? -- ' + (installedPackageListJson === undefined));
 
     if ( installedPackageListJson === undefined || installedPackageListJson.status !== 0 ) {
-        installedPackageListJson = await PackageInstalledListCommand.run( args );
+        thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- prior to second execution of PackageInstalledListCommand.run');
+        try {
+            installedPackageListJson = await PackageInstalledListCommand.run( args );
+            thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- after second execution of PackageInstalledListCommand.run');            
+        } catch (e) {
+            if(e instanceof Error) {
+                let theError = (e as Error);
+                thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- name: ' + theError.name);
+                thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- message: ' + theError.message);
+                thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- stack: ' + theError.stack);
+            }
+            else {
+                thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- EXCEPTION THROWN -- unknown error : ' + e);
+                throw e;
+            }                
+        }
     }
 
+    thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- prior to execution of unhookIntercept');
     // Stop capturing stdout.
     unhookIntercept();
 
     thisUx.stopSpinner();
 
+    thisDebugMessages.push('force_package.retrievePackagesCurrentlyInstalled method -- ends');
     return installedPackageListJson as SubscriberInstalledPackageVersion[];
 }
 
