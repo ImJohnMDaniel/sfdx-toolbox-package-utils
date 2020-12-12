@@ -1,4 +1,4 @@
-import { SfdxCommand, UX } from '@salesforce/command';
+import { UX } from '@salesforce/command';
 import { Org } from '@salesforce/core';
 import * as _ from 'lodash';
 import { PackageInstalledListCommand } from 'salesforce-alm/dist/commands/force/package/installed/list';
