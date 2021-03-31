@@ -38,8 +38,11 @@ export default class Install extends SfdxCommand {
   protected static requiresUsername = true;
 
   // Comment this out if your command does not require a hub org username
-  protected static requiresDevhubUsername = true;
+  protected static requiresDevhubUsername = false;
 
+  // If true, then the command supported the parameter of specifying the hub org username
+  protected static supportsDevhubUsername = false;
+ 
   // Set this to true if your command requires a project workspace; 'requiresProject' is false by default
   protected static requiresProject = true;
 
@@ -63,6 +66,8 @@ export default class Install extends SfdxCommand {
 
     this.processDebugMessage('install.run method -- before call to forcePackageCommand.retrievePackagesCurrentlyInstalled');
     const debugMessages = [];
+    this.debug('this.org is populated??');
+    this.debug(this.org);
     const packageVersionsAlreadyInstalled = this.flags.noprecheck ? undefined : await forcePackageCommand.retrievePackagesCurrentlyInstalled(this.org, this.ux, debugMessages);
     this.processDebugMessages(debugMessages);
     this.processDebugMessage('install.run method -- after call to forcePackageCommand.retrievePackagesCurrentlyInstalled');
@@ -100,10 +105,17 @@ export default class Install extends SfdxCommand {
           packageInfo.dependentPackage = dependentPackage;
           packageInfo.versionNumber = versionNumber;
 
+          this.processDebugMessage('==============================================================================');
+          this.processDebugMessage(JSON.stringify(packageInfo));
+          this.processDebugMessage('==============================================================================');
+          
           //  if versionNumber is undefined and dependentPackage is a packageAlias, then the alias should return the package version 04t id
           //  if that is the case, then there is no need to get the devHubServier to resolve the package version id
           // is the dependentPackage an alias?
           const matched = aliasKeys.find(item => item === dependentPackage);
+          this.processDebugMessage('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+          this.processDebugMessage(matched);
+          this.processDebugMessage('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
           if (matched) {
             // the dependentPackage value is a packageAlias
             if (packageAliases[matched].startsWith(Constants.PACKAGE_VERSION_ID_PREFIX)) {
@@ -114,6 +126,9 @@ export default class Install extends SfdxCommand {
               packageInfo.packageVersionId = await devHubService.resolvePackageVersionId(packageAliases[matched], JSON.stringify(versionNumber), this.flags.branch, this.hubOrg);
             }
           } else {
+            this.processDebugMessage('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+            this.processDebugMessage(JSON.stringify(dependentPackage));
+            this.processDebugMessage('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
             // the dependentPackage value is an id
             // find the packageVersionId from the DevHub
             if (JSON.stringify(dependentPackage).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX)) {
@@ -124,7 +139,7 @@ export default class Install extends SfdxCommand {
             }
           }
           packagesToInstall.push(packageInfo);
-
+          
           this.ux.log(`    ${packageInfo.packageVersionId} : ${packageInfo.dependentPackage}${packageInfo.versionNumber === undefined ? '' : ' ' + packageInfo.versionNumber}`);
         }
       } else {
@@ -161,7 +176,9 @@ export default class Install extends SfdxCommand {
       let i = 0;
       for (let packageInfo of packagesToInstall) {
         packageInfo = packageInfo as JsonMap;
-
+        this.processDebugMessage('*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|');
+        this.processDebugMessage(JSON.stringify(packageInfo));  
+        this.processDebugMessage('*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|*|');
         // Check to see if this package version has already been installed in the org.
         const matchedAlreadyInstalled = packageVersionsAlreadyInstalled === undefined ? false : packageVersionsAlreadyInstalled.find(item => item.SubscriberPackageVersionId === packageInfo.packageVersionId);
 
@@ -176,7 +193,7 @@ export default class Install extends SfdxCommand {
           packagesNotInstalled[packageInfo.packageVersionId] = packageInfo;
           continue;
         }
-
+        this.processDebugMessage('breadcrumb A');
         // Check to see if  this package version been installed as part of this installation event?  probably from one of the package directories in the sfdx-project.json
         const matchedJustInstalled = Object.keys(packagesInstalled).find(item => item === packageInfo.packageVersionId);
         if (matchedJustInstalled) {
@@ -187,21 +204,21 @@ export default class Install extends SfdxCommand {
 
         // Split arguments to be used by the OCLIF command -- PackageInstallCommand
         const args = [];
-
+        this.processDebugMessage('breadcrumb B');
         // USERNAME
         args.push('--targetusername');
         args.push(`${this.org.getUsername()}`);
-
+        this.processDebugMessage('breadcrumb C');
         // PACKAGE ID
         args.push('--package');
         args.push(`${packageInfo.packageVersionId}`);
-
+        this.processDebugMessage('breadcrumb D');
         // INSTALLATION KEY
         if (installationKeys && installationKeys[i]) {
           args.push('--installationkey');
           args.push(`${installationKeys[i]}`);
         }
-
+        this.processDebugMessage('breadcrumb E');
         // WAIT
         const wait = this.flags.wait ? this.flags.wait : defaultWait;
         args.push('--wait');
@@ -231,19 +248,22 @@ export default class Install extends SfdxCommand {
         if (this.flags.json) {
           args.push('--json');
         }
-
+        this.processDebugMessage('breadcrumb F');
         // INSTALL PACKAGE
         // TODO: How to add a debug flag or write to sfdx.log with --loglevel ?
         this.ux.log(`\nInstalling package ${packageInfo.packageVersionId} : ${packageInfo.dependentPackage}${packageInfo.versionNumber === undefined ? '' : ' ' + packageInfo.versionNumber}`);
+        this.processDebugMessage('******************************************************************************');
+        this.processDebugMessage(JSON.stringify(args));
+        this.processDebugMessage('******************************************************************************');
 
         if (!this.flags.dryrun) {
 
           let installationResultJson;
 
           if (this.flags.json) {
+            this.processDebugMessage('breadcrumb G');
             // let capturedText = {} as AnyJson;
             const intercept = require('intercept-stdout');
-
             // setup the intercept function to silence the output of PackageInstallCommand call
             // tslint:disable-next-line: only-arrow-functions
             const unhookIntercept = intercept(function(text) {
@@ -251,7 +271,6 @@ export default class Install extends SfdxCommand {
               // capturedText = text;
               return '';
             });
-
             installationResultJson = await PackageInstallCommand.run(args);
 
             // reactivate the output to console.
@@ -266,8 +285,9 @@ export default class Install extends SfdxCommand {
             }
           } else {
             // non JSON route
+            this.processDebugMessage('breadcrumb J');
             installationResultJson = await PackageInstallCommand.run(args) as SObjectBasedAPICallResult<PackageInstallRequest>;
-
+            this.processDebugMessage('breadcrumb K');
             if (installationResultJson === undefined || installationResultJson.Status !== 'SUCCESS') {
               throw Error('Problems installing the package ' + packageInfo.packageVersionId);
             }

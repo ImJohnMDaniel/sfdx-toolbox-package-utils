@@ -34,17 +34,17 @@ sfdx plugins:link .
 ```
 # Commands
 <!-- commands -->
-* [`sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesinstall--a-allpackage--b-string---dryrun--k-string---noprecheck--p--s-allusersadminsonly--w-number--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesinstall--a-allpackage--b-string---dryrun--k-string---noprecheck--p--s-allusersadminsonly--w-number--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx toolbox:package:dependencies:manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesmanage--b-string---updatetoreleased----updatetolatest--v-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Install dependent packages for a sfdx project
 
 ```
 USAGE
   $ sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] 
-  [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
+  [-p] [-s AllUsers|AdminsOnly] [-w <number>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -67,9 +67,6 @@ OPTIONS
 
   -u, --targetusername=targetusername
       username or alias for the target org; overrides default target org
-
-  -v, --targetdevhubusername=targetdevhubusername
-      username or alias for the dev hub org; overrides default dev hub org
 
   -w, --wait=wait
       Number of minutes to wait for installation status (also used for publishwait). Default is 10
@@ -95,7 +92,7 @@ EXAMPLE
   $ toolbox:package:dependencies:install -u MyScratchOrg -v MyDevHub -k "1:MyPackage1Key 2: 3:MyPackage3Key" -b "DEV"
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.3.3/src/commands/toolbox/package/dependencies/install.ts)_
+_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.3.4/src/commands/toolbox/package/dependencies/install.ts)_
 
 ## `sfdx toolbox:package:dependencies:manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -137,5 +134,5 @@ EXAMPLE
   devhub@org.com
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/manage.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.3.3/src/commands/toolbox/package/dependencies/manage.ts)_
+_See code: [src/commands/toolbox/package/dependencies/manage.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.3.4/src/commands/toolbox/package/dependencies/manage.ts)_
 <!-- commandsstop -->
