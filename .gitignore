@@ -5,6 +5,7 @@
 /lib
 /package-lock.json
 /tmp
+/temp
 node_modules
 .DS_Store
 yarn.lock
