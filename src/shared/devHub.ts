@@ -234,18 +234,34 @@ export class DevHubDependencies {
     }
 
     private findLatestBuildSameMajorMinorVersion(options: InquirerOption[]) {
+        // this.logger('mark 2B1');
+        // this.logger('mark 2B1 - ' + this.currentBranch);
         if ( this.currentBranch ) {
+            // this.logger('mark 2B1A');
             const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, this.currentBranch);
-
+            // this.logger('mark 2B1B - currentBuildBlock: ' + currentBuildBlock);
             if (currentBuildBlock) {
                 options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on \'' + this.currentBranch + '\' branch', this.currentBranch));
             } else {
                 this.ux.log('    -- No option found for latest build on same major and minor version of branch : ' + this.currentBranch);
             }
+            // this.logger('mark 2B1C');
+        } else {
+            // this.logger('mark 2B2A');
+            const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, '');
+            // this.logger('mark 2B2B - currentBuildBlock: ' + currentBuildBlock);
+            if (currentBuildBlock) {
+                options.push(this.createOptionBySubscriberPackageVersionId(this.findLatestBuildFromBlock(currentBuildBlock), 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on main build branch', this.currentBranch));
+            } else {
+                this.ux.log('    -- No option found for latest build on the main build branch');
+            }
+            // this.logger('mark 2B2C');
         }
     }
 
     private findLatestMainBranchBuildVersion(options: InquirerOption[]) {
+        // this.logger('mark 2CA');
+        // this.logger('mark 2CA - ' + this.currentBranch);
         const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
 
         if (currentBuildBlock) {
