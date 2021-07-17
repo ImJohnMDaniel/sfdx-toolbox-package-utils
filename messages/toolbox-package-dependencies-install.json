@@ -10,6 +10,7 @@
     "flagNopromptDescription": "Allow Remote Site Settings and Content Security Policy websites to send or receive data without confirmation",
     "flagPromptDescription": "Require approval to allow Remote Site Settings and Content Security Policy websites to send or receive data",
     "flagSecuritytypeDescription": "security access type for the installed package",
+    "flagUpgradetypeDescription": "the upgrade type for the package installation; available only for unlocked packages",
     "flagWaitDescription": "Number of minutes to wait for installation status (also used for publishwait). Default is 10",
     "invalidPackageName": "Invalid Package Name",
     "invalidVersionNumber": "Invalid Version Number",

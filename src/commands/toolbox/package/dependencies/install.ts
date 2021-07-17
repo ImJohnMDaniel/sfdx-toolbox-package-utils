@@ -31,6 +31,7 @@ export default class Install extends SfdxCommand {
     noprecheck: flags.boolean({ required: false, default: false, description: messages.getMessage('flagNoPrecheckDescription') }),
     prompt: flags.boolean({ char: 'p', default: false, required: false, description: messages.getMessage('flagPromptDescription') }),
     securitytype: flags.enum({ char: 's', default: 'AdminsOnly', required: false, description: messages.getMessage('flagSecuritytypeDescription'), options: ['AllUsers', 'AdminsOnly']}),
+    upgradetype: flags.enum({ char: 't', default: 'Mixed', required: false, description: messages.getMessage('flagUpgradetypeDescription'), options: ['DeprecateOnly', 'Mixed', 'Delete']}),
     wait: flags.number({ char: 'w', required: false, description: messages.getMessage('flagWaitDescription') })
   };
 
@@ -230,6 +231,12 @@ export default class Install extends SfdxCommand {
         if (this.flags.securitytype) {
           args.push('--securitytype');
           args.push(`${this.flags.securitytype}`);
+        }
+
+        // UPGRADETYPE
+        if (this.flags.upgradetype) {
+          args.push('--upgradetype');
+          args.push(`${this.flags.upgradetype}`);
         }
 
         // PROMPT
