@@ -23,7 +23,7 @@ export default class Install extends SfdxCommand {
 
   public static examples = [messages.getMessage('examplesDescription')];
 
-  protected static flagsConfig = {
+  public static flagsConfig = {
     apexcompile: flags.enum({ char: 'a', default: 'all', required: false, description: messages.getMessage('flagApexCompileDescription'), options: ['all', 'package'] }),
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
     dryrun: flags.boolean({ required: false, description: messages.getMessage('flagDryrunDescription') }),

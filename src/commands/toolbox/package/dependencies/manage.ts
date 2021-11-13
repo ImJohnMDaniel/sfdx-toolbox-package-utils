@@ -21,7 +21,7 @@ export default class Manage extends SfdxCommand {
 
   public static examples = [messages.getMessage('examplesDescription')];
 
-  protected static flagsConfig = {
+  public static flagsConfig = {
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
     updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription'), exclusive: ['updatetolatest'] }),
     updatetolatest: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToLatestDescription'), exclusive: ['updatetoreleased']})
