@@ -80,7 +80,7 @@ export async function resolvePackageVersionId(name: string, version: string, bra
     // Assemble the query needed
     let query = 'Select SubscriberPackageVersionId, IsPasswordProtected, IsReleased ';
     query += 'from Package2Version ';
-    query += `where Package2Id='${packageName}' and MajorVersion=${vers[0]} `;
+    query += `where Package2Id='${packageName}' and MajorVersion=${vers[0]} and IsDeprecated = false   `;
 
     // If Minor Version isn't set to LATEST, look for the exact Minor Version
     if (vers[1]) {
