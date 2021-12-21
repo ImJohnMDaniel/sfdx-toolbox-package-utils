@@ -195,7 +195,7 @@ export default class Install extends SfdxCommand {
           continue;
         }
         this.processDebugMessage('breadcrumb A');
-        // Check to see if  this package version been installed as part of this installation event?  probably from one of the package directories in the sfdx-project.json
+        // Check to see if this package version been installed as part of this installation event?  probably from one of the package directories in the sfdx-project.json
         const matchedJustInstalled = Object.keys(packagesInstalled).find(item => item === packageInfo.packageVersionId);
         if (matchedJustInstalled) {
           // This was just installed
