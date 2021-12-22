@@ -1,4 +1,5 @@
-import { core, flags, SfdxCommand } from '@salesforce/command';
+import { flags, SfdxCommand } from '@salesforce/command';
+import { Messages } from '@salesforce/core';
 import * as inquirer from 'inquirer';
 import * as _ from 'lodash';
 import { Constants } from '../../../../shared/constants';
@@ -10,11 +11,11 @@ import { ProjectDependencyChange } from '../../../../types/project_dependency_ch
 import { ProjectPackageDirectoryDependency } from '../../../../types/project_package_directory_dependency';
 
 // Initialize Messages with the current plugin directory
-core.Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = core.Messages.loadMessages('@dx-cli-toolbox/sfdx-toolbox-package-utils', 'toolbox-package-dependencies-manage');
+const messages = Messages.loadMessages('@dx-cli-toolbox/sfdx-toolbox-package-utils', 'toolbox-package-dependencies-manage');
 
 export default class Manage extends SfdxCommand {
   public static description = messages.getMessage('commandDescription');

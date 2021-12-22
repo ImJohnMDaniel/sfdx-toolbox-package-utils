@@ -1,4 +1,5 @@
-import { core, UX } from '@salesforce/command';
+import { UX } from '@salesforce/command';
+import { SfdxProject, SfdxProjectJson } from '@salesforce/core';
 import { PackageDir, PackageDirDependency } from '@salesforce/core/lib/sfdxProject';
 import { AnyJson, JsonArray, JsonMap } from '@salesforce/ts-types';
 import * as _ from 'lodash';
@@ -13,16 +14,16 @@ import { Utils } from './utils';
  */
 export class SfdxProjects {
 
-    public static async getInstance( sfdxProject: core.SfdxProject, thisUx: UX ) {
+    public static async getInstance( sfdxProject: SfdxProject, thisUx: UX ) {
         const sfdxProjectJson = await sfdxProject.retrieveSfdxProjectJson();
 
         return new SfdxProjects(sfdxProjectJson, thisUx);
     }
 
-    private sfdxProjectJson: core.SfdxProjectJson;
+    private sfdxProjectJson: SfdxProjectJson;
     private ux: UX;
 
-    private constructor( sfdxProjectJson: core.SfdxProjectJson, thisUx: UX ) {
+    private constructor( sfdxProjectJson: SfdxProjectJson, thisUx: UX ) {
         this.sfdxProjectJson = sfdxProjectJson;
         this.ux = thisUx;
     }
@@ -232,8 +233,8 @@ export class SfdxProjects {
     private resolveDependencyAliases( dependency: AnyJson ): AnyJson {
         if ( Object.keys(dependency).find(item => item === 'package') ) {
             dependency['package'] = this.resolveAlias(dependency['package']);
+            return dependency;
         }
-        return dependency;
     }
 
     private getAliases(): AnyJson {

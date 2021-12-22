@@ -1,12 +1,11 @@
-import { core } from '@salesforce/command';
-import { Org } from '@salesforce/core';
+import { Org, SfdxError } from '@salesforce/core';
 // import { DevHubPackageVersion } from '../types/devhub_package_version';
 import { Constants } from './constants';
 // import forcePackageCommand = require('./forceCommands/force_package');
 
 export function resolveDevHubOrgInstance(thisOrg: Org): Org {
   if (!thisOrg) {
-    throw new core.SfdxError('Method Parameter Exception: the following parameters must be supplied for resolveDevHubOrgInstance() -- thisOrg');
+    throw new SfdxError('Method Parameter Exception: the following parameters must be supplied for resolveDevHubOrgInstance() -- thisOrg');
   }
 
   let theDevHubOrg: Org;
@@ -46,7 +45,7 @@ export async function resolvePackageVersionId(name: string, version: string, bra
       parameters.push('thisOrg');
     }
 
-    throw new core.SfdxError('Method Parameter Exception: the following parameters must be supplied for resolvePackageVersionId() -- ' + parameters.join());
+    throw new SfdxError('Method Parameter Exception: the following parameters must be supplied for resolvePackageVersionId() -- ' + parameters.join());
   }
 
   // Determine if the org supplied is the DevHub or an org that is
@@ -121,7 +120,7 @@ export async function resolvePackageVersionId(name: string, version: string, bra
     if (resultPackageVersionRecord.size === 0) {
       // Query returned no result
       const errorMessage = `Unable to find SubscriberPackageVersionId for dependent package ${name}`;
-      throw new core.SfdxError(errorMessage);
+      throw new SfdxError(errorMessage);
     } else {
       packageId = resultPackageVersionRecord.records[0].SubscriberPackageVersionId;
     }

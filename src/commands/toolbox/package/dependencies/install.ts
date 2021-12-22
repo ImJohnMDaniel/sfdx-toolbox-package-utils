@@ -1,4 +1,5 @@
-import { core, flags, SfdxCommand } from '@salesforce/command';
+import { flags, SfdxCommand } from '@salesforce/command';
+import { Messages, SfdxError } from '@salesforce/core';
 import { JsonArray, JsonMap } from '@salesforce/ts-types';
 import * as _ from 'lodash';
 import { PackageInstallCommand } from 'salesforce-alm/dist/commands/force/package/install';
@@ -11,11 +12,11 @@ import { SObjectBasedAPICallResult } from '../../../../types/sobject';
 const defaultWait = 10;
 
 // Initialize Messages with the current plugin directory
-core.Messages.importMessagesDirectory(__dirname);
+Messages.importMessagesDirectory(__dirname);
 
 // Load the specific messages for this file. Messages from @salesforce/command, @salesforce/core,
 // or any library that is using the messages framework can also be loaded this way.
-const messages = core.Messages.loadMessages('@dx-cli-toolbox/sfdx-toolbox-package-utils', 'toolbox-package-dependencies-install');
+const messages = Messages.loadMessages('@dx-cli-toolbox/sfdx-toolbox-package-utils', 'toolbox-package-dependencies-install');
 
 export default class Install extends SfdxCommand {
 
@@ -167,7 +168,7 @@ export default class Install extends SfdxCommand {
             installationKeys[keyIndex] = key.substring(2);
           } else {
             // Format is not correct, throw an error
-            throw new core.SfdxError(messages.getMessage('errorInstallationKeyFormat'));
+            throw new SfdxError(messages.getMessage('errorInstallationKeyFormat'));
           }
         }
       }
