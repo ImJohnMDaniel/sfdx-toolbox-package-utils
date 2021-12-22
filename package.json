@@ -14,7 +14,7 @@
     "fs-extra": "^10.0.0",
     "inquirer": "^8.2.0",
     "intercept-stdout": "^0.1.2",
-    "salesforce-alm": "^53.7.1",
+    "salesforce-alm": "^53.7.2",
     "tslib": "^2.3.1"
   },
   "devDependencies": {
