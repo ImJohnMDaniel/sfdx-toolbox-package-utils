@@ -52,11 +52,11 @@ OPTIONS
       [default: all] compile all Apex in the org and package, or only Apex in the package
 
   -b, --branch=branch
-      For dependencies specified by package/versionNumber combination, you can specify the branch group of builds to work 
+      For dependencies specified by package/versionNumber combination, you can specify the branch group of builds to work
       from by entering the branch build name.  If not specified, the builds from NULL branch will be considered.
 
   -k, --installationkeys=installationkeys
-      Installation key for key-protected packages (format is 1:MyPackage1Key 2: 3:MyPackage3Key... to allow some packages 
+      Installation key for key-protected packages (format is 1:MyPackage1Key 2: 3:MyPackage3Key... to allow some packages
       without installation key)
 
   -p, --prompt
@@ -81,7 +81,7 @@ OPTIONS
       override the api version used for api requests made by this command
 
   --dryrun
-      Allows the command to execute and display result information without actually performing the package installations.  
+      Allows the command to execute and display result information without actually performing the package installations.
       Useful if debugging.
 
   --json
@@ -91,14 +91,14 @@ OPTIONS
       [default: warn] logging level for this command invocation
 
   --noprecheck
-      Allows the command to bypass the pre-check of the target org and force install all packages even if they are already 
+      Allows the command to bypass the pre-check of the target org and force install all packages even if they are already
       installed.
 
 EXAMPLE
   $ toolbox:package:dependencies:install -u MyScratchOrg -v MyDevHub -k "1:MyPackage1Key 2: 3:MyPackage3Key" -b "DEV"
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.7.2/src/commands/toolbox/package/dependencies/install.ts)_
+_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.8.0/src/commands/toolbox/package/dependencies/install.ts)_
 
 ## `sfdx toolbox:package:dependencies:manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -140,5 +140,5 @@ EXAMPLE
   devhub@org.com
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/manage.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.7.2/src/commands/toolbox/package/dependencies/manage.ts)_
+_See code: [src/commands/toolbox/package/dependencies/manage.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.8.0/src/commands/toolbox/package/dependencies/manage.ts)_
 <!-- commandsstop -->
