@@ -44,81 +44,32 @@ export default class Manage extends SfdxCommand {
 
     const isInteractiveMode = !this.flags.updatetoreleased && !this.flags.updatetolatest;
 
-    // if (this.flags.json && isInteractiveMode) {
-    //   this.error("'--json' flag is not allowed in conjuection ");
-    // }
-
-    // this.ux.startSpinner(messages.getMessage('commandSpinner')); // Spinners don't help in interactive mode
-    // this.org is guaranteed because requiresUsername=true, as opposed to supportsUsername
-    // const conn = this.org.getConnection();
-
     const theSfdxProject = await SfdxProjects.getInstance(this.project, this.ux);
 
     const theDevHubDependencies = await DevHubDependencies.getInstance(this.hubOrg, this.ux);
 
-    // const packageDependencyChangeSet = [];
     const packageDependencyChangeMap: Map<string, ProjectDependencyChange[]> = new Map<string, ProjectDependencyChange[]>();
 
     const projectJson = await this.project.retrieveSfdxProjectJson();
     let dependenciesToIgnore = _.get(projectJson['contents'], 'plugins.toolbox.dependencies.ignore', false) as string[];
 
-    // console.log('dependenciesToIgnore-1');
-    // console.log(dependenciesToIgnore);
-    // console.log('dependenciesToIgnore-2');
-    // if ( !dependenciesToIgnore ) {
-    //   dependenciesToIgnore = [];
-    //   console.log('dependenciesToIgnore re-initialized as empty array');
-    //   console.log(dependenciesToIgnore);
-    // }
-
-    // console.log('dependenciesToIgnore-3');
-    // console.log(dependenciesToIgnore[0]);
-    // console.log('dependenciesToIgnore-4');
-    // console.log(dependenciesToIgnore.includes('blue'));
-    // console.log('dependenciesToIgnore-5');
-    // console.log(dependenciesToIgnore.includes('reference-force-di'));
-    // console.log('dependenciesToIgnore-6');  
-
-    // console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-di', false) as string);
-    // console.log(_.get(projectJson['contents'], 'packageAliases.reference-force-i', false) as string);
-
-    // Step 1D: for each dependency, prep choices
-    // theSfdxProject.getProjectDependencies().forEach(async (element: ProjectPackageDirectoryDependency) => {
     const evaluateOptions = async () => {
-      // console.log('Hello');
-      // console.log(theSfdxProject.getProjectDependenciesByPackageDirectoryPath().keys());
-      // // await this.asyncForEach( theSfdxProject.getProjectDependenciesByPackageDirectoryPath().keys(), (packageDirectoryPath: string) => {
-      //   console.log(packageDirectoryPath);
-      // });
-
-      // for (const [key, value] of theSfdxProject.getProjectDependenciesByPackageDirectoryPath()) {
-      //   console.log(key, value);
-      // }
-
       let aProjectDependencyChange: ProjectDependencyChange;
 
-      // await this.asyncForEach( theSfdxProject.getProjectDependenciesByPackageDirectoryPath().keys(), async (packageDirectoryPath: string) => {
       for (const [packageDirectoryPath, dependenciesForPackageDirectoryPath] of theSfdxProject.getProjectDependenciesByPackageDirectoryPath()) {
-        // console.log('Hello Again.... ' + packageDirectoryPath);
+        
         packageDependencyChangeMap.set( packageDirectoryPath, []);
 
-        // const dependenciesForPackageDirectoryPath = theSfdxProject.getProjectDependenciesByPackageDirectoryPath().get(packageDirectoryPath);
-
-        // console.log(packageDirectoryPath);
         await this.asyncForEach(dependenciesForPackageDirectoryPath, async (element: ProjectPackageDirectoryDependency) => {
           this.ux.log('');
-          // console.log(packageDirectoryPath);
-          // console.log(element);
+
           const dependencyDisplayName = theSfdxProject.getDependencyDisplayName(element);
           // if packageVersionId is not part of the devHubPackageVersionInfosBySubscriberPackageVersionMap
           //  then this packageDependency is not owned by this DevHub
           // so only take action if the packageVersionId is found or the package2Id is found
           if (theDevHubDependencies.for(element).onBranch(this.flags.branch).knowsAboutThisDependency()) {
             // What do I want to do with this dependency now?
-            // console.log('DevHub knows about dependency');
-            // console.log('theSfdxProject.findAlias(element.getSubscriberPackageVersionId()) == ' + theSfdxProject.findAlias(element.getSubscriberPackageVersionId()));
             this.ux.log(messages.getMessage('messageReviewingOptionsForPackageDependency', [dependencyDisplayName]));
-            // console.log('mark 1');
 
             let theOriginalVersionAlias = theDevHubDependencies.getAlias() ;
 
@@ -134,10 +85,6 @@ export default class Manage extends SfdxCommand {
               // Use the DevHub to get the package alias instead.
               dependencyPackageDisplayName = Utils.createDependencyPackageDisplayName(package2Id, theDevHubDependencies.findAliasForPackage2Id(package2Id));
             }
-            // console.log(dependencyPackageDisplayName); // reference-force-di (0Ho1T000000PAshSAG)
-
-            // console.log(theDevHubDependencies.getPackage2IDForCurrentDependency());
-            // console.log(theDevHubDependencies.findAliasForPackage2Id(theDevHubDependencies.getPackage2IDForCurrentDependency()));
 
             // should this dependency be skipped?
             const isDependencyIgnored = ( dependenciesToIgnore
@@ -146,7 +93,6 @@ export default class Manage extends SfdxCommand {
                                              )
                                         );
 
-            // console.log('mark 2');
             let dependencyPackageChoices = [] as InquirerOption[];
 
             if ( isDependencyIgnored ) {
@@ -161,7 +107,6 @@ export default class Manage extends SfdxCommand {
               }
             }
 
-            // console.log('mark 3');
             this.ux.log('');
             if (dependencyPackageChoices.length > 0) {
 
@@ -179,14 +124,12 @@ export default class Manage extends SfdxCommand {
 
                 if ( packageVersionSelectionResponses.version
                   && (packageVersionSelectionResponses.version as string).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX) ) {
-                  // console.log('pinned route');
                   newDependencyAlias = theDevHubDependencies.findAliasForSubscriberPackageVersionId(packageVersionSelectionResponses.version);
                   aProjectDependencyChange = new ProjectDependencyChange()
                       .setOldVersion( theOriginalVersionAlias, element )
                       .setNewVersion( newDependencyAlias
                                   , theDevHubDependencies.findDependencyBySubscriberPackageVersionId(packageVersionSelectionResponses.version));
                 } else {
-                  // console.log('non-pinned route');
                   const packageNonPinnedDependency: ProjectPackageDirectoryDependency = new ProjectPackageDirectoryDependency();
                   packageNonPinnedDependency.setPackageAndVersionNumber( (packageVersionSelectionResponses.version as string).split('|')[0], (packageVersionSelectionResponses.version as string).split('|')[1]);
 
@@ -201,7 +144,6 @@ export default class Manage extends SfdxCommand {
               } else {
                 // not in interactive mode
                 const dependencyPackageChoice = dependencyPackageChoices[0];
-                // console.log(dependencyPackageChoice);
 
                 if ( dependencyPackageChoice.value
                   && (dependencyPackageChoice.value as string).startsWith(Constants.PACKAGE_VERSION_ID_PREFIX) ) {
@@ -227,9 +169,6 @@ export default class Manage extends SfdxCommand {
                 }
               }
 
-              // console.log('aProjectDependencyChange');
-              // console.log(aProjectDependencyChange);
-              // console.log('***************************************************************************************************');
               this.ux.log('');
 
               if ( isDependencyIgnored ) {
@@ -272,68 +211,10 @@ export default class Manage extends SfdxCommand {
           this.ux.log('');
         });
       }
-
-      // theSfdxProject.getProjectDependenciesByPackageDirectoryPath().forEach( async (dependenciesForPackageDirectoryPath: ProjectPackageDirectoryDependency[], packageDirectoryPath: string) => {
-
-      // }); // end of evaluateOptions
     };
-
-    // END OF Step 1D /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // await cli.prompt('What is your name?');
-
-    // // mask input after enter is pressed
-    // await cli.prompt('What is your two-factor token?', { type: 'mask' });
-
-    // // mask input on keypress (before enter is pressed)
-    // await cli.prompt('What is your password?', { type: 'hide' });
-
-    // let stage = this.flags.stage;
-    // if (!stage) {
-    //   // tslint:disable-next-line: no-any
-    //   const responses: any = await inquirer.prompt([{
-    //     name: 'stage',
-    //     message: 'select a stage',
-    //     type: 'list',
-    //     choices: [{ name: 'development' }, { name: 'staging' }, { name: 'production' }],
-    //     pageSize: 3
-    //   }]);
-    //   stage = responses.stage;
-    //   this.log(`the stage is: ${stage}`);
-    // }
-
-    // // tslint:disable-next-line: no-any
-    // let packageVersionSelectionResponses: any = await inquirer.prompt([{
-    //   name: 'version',
-    //   message: 'which released version of apex-mocks should be used',
-    //   type: 'list',
-    //   choices: [{ name: '1.0.0.0' }, { name: '1.1.0.5' }, { name: '1.2.0.7' }, { name: '1.3.0.1' }, { name: '1.4.1.2' }, { name: '1.5.0.3' }, { name: '1.6.0.1' }],
-    //   pageSize: 3
-    // }]);
-
-    // this.log(`apex-mocks version selected: ${packageVersionSelectionResponses.version}`);
-
-    // // yes/no confirmation
-    // await cli.confirm('Continue?');
-
-    // "press any key to continue"
-    // await cli.anykey();
-
-    // this.ux.stopSpinner();
-
-    // this.ux.log( messages.getMessage('commandSuccess', [this.org.getOrgId()]) );
 
     await evaluateOptions();
 
-    // console.log('************************************************************************************************');
-    // console.log('packageDependencyChangeMap');
-    // console.log(packageDependencyChangeMap);
-    // console.log('************************************************************************************************');
-    // create a deep clone of the packageDependencyChangeMap for later JSON output
-    // const packageDependencyChangeMapForOutput = packageDependencyChangeMap;
-    // console.log('************************************************************************************************');
-    // console.log('packageDependencyChangeMapForOutput');
-    // console.log(packageDependencyChangeMapForOutput);
-    // console.log('************************************************************************************************');
     const updatePackageDependencyList = async () => {
       packageDependencyChangeMap.forEach( async (packageDependencyChanges: ProjectDependencyChange[], packageDirectoryPath: string) => {
         await this.asyncForEach(packageDependencyChanges, async (element: ProjectDependencyChange) => {
@@ -344,14 +225,7 @@ export default class Manage extends SfdxCommand {
     };
 
     await updatePackageDependencyList();
-    // console.log('************************************************************************************************');
-    // console.log('packageDependencyChangeMap at the end');
-    // console.log(packageDependencyChangeMap);
-    // console.log('************************************************************************************************');
-    // console.log('************************************************************************************************');
-    // console.log('packageDependencyChangeMapForOutput at the end');
-    // console.log(packageDependencyChangeMapForOutput);
-    // console.log('************************************************************************************************');
+
     return this.convertPackageDependencyChangeMapToJson(packageDependencyChangeMap);
   }
 
