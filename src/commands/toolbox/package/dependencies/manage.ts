@@ -96,9 +96,9 @@ export default class Manage extends SfdxCommand {
             let dependencyPackageChoices = [] as InquirerOption[];
 
             if ( isDependencyIgnored ) {
-              dependencyPackageChoices = theDevHubDependencies.prepareSameDependencyOptionForCurrentDependency();
+              dependencyPackageChoices = theDevHubDependencies.prepareSameDependencyOptionForCurrentDependency(dependencyPackageDisplayName);
             } else if (isInteractiveMode) {
-              dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
+              dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency(dependencyPackageDisplayName);
             } else {
               if ( this.flags.updatetoreleased ) {
                 dependencyPackageChoices = theDevHubDependencies.prepareRelatedReleasedDependencyOptionsForCurrentDependency();

@@ -5,6 +5,7 @@ import { DevHubPackageVersion } from '../types/devhub_package_version';
 import { InquirerOption } from '../types/inquirer_option';
 import { ProjectPackageDirectoryDependency } from '../types/project_package_directory_dependency';
 import forcePackageCommand = require('./forceCommands/force_package');
+import * as inquirer from 'inquirer';
 import { Utils } from './utils';
 
 export class DevHubDependencies {
@@ -75,13 +76,16 @@ export class DevHubDependencies {
         return options;
     }
 
-    public prepareSameDependencyOptionForCurrentDependency(): InquirerOption[] {
+    public prepareSameDependencyOptionForCurrentDependency(dependencyPackageDisplayName: string): InquirerOption[] {
         const options: InquirerOption[] = [];
         this.createSameOptionAsCurrent(options);
+        // this.createNewPackageOption(options);
+        this.createRemovePackageOption(options, dependencyPackageDisplayName);
+
         return options;
     }
 
-    public prepareRelatedDependencyOptionsForCurrentDependency(): InquirerOption[] {
+    public prepareRelatedDependencyOptionsForCurrentDependency(dependencyPackageDisplayName: string): InquirerOption[] {
         // TODO: implement "Is there a newer Major version available?"
         // There is a distinction between "next available version" and "next avaialble released version"
         // There is a distinction between "the base/null branch" verses the "feature branch" that is coming from Branch flag
@@ -128,6 +132,12 @@ export class DevHubDependencies {
 
         // Create an option to keep the current version specified in the sfdx-project.json
         this.createSameOptionAsCurrent(options);
+        this.logger(options.length);
+
+        // this.createNewPackageOption(options);
+        // this.logger(options.length);
+
+        this.createRemovePackageOption(options, dependencyPackageDisplayName);
         this.logger(options.length);
 
         return options;
@@ -177,16 +187,17 @@ export class DevHubDependencies {
     }
 
     private createOptionBySubscriberPackageVersionId(packageVersion: DevHubPackageVersion, extraNameText: string, branchText: string): InquirerOption {
+
         const option = new InquirerOption();
         option.value = packageVersion.SubscriberPackageVersionId;
-        // option.short = this.createVersionAliasSegmentString( packageVersion.Version, branchText );
-        // option.name = extraNameText + ': ' + this.createVersionAliasSegment(packageVersion);
         option.short = Utils.createVersionAliasSegmentString(packageVersion.Version, branchText );
         option.name = extraNameText + ': ' + Utils.createVersionAliasSegment(packageVersion);
+
         return option;
     }
 
     private createOptionByPackage2Id(packageVersion: DevHubPackageVersion, extraNameText: string): InquirerOption {
+
         const aliasSegment: string = packageVersion.MajorVersion + '.' + packageVersion.MinorVersion + '.' + packageVersion.PatchVersion + '.LATEST';
 
         const option = new InquirerOption();
@@ -195,6 +206,38 @@ export class DevHubDependencies {
         option.name = extraNameText;
 
         return option;
+    }
+
+    private createSeparatorOption(): InquirerOption {
+        return new inquirer.Separator();
+    }
+
+    private createRemovePackageOption(options: InquirerOption[], dependencyPackageDisplayName: string) {
+        this.logger('devHub.createRemovePackageOption method called');
+        // remove the current version from the project
+        // options.push(this.currentPackageDependency );
+
+        options.push(this.createSeparatorOption());
+
+
+// ****** THIS NEEDS TO CREATE A NEW InquirerOption THAT WILL SIGNIFY THE NEED TO REMOVE THE PACKAGE ONCE THIS OPTION IS SELECTED
+// 
+// What needs to be put here?
+// 
+//      What I know at this point is
+//      - the current package version -- the 04t and the alias
+//      - the dependencyPackageDisplayName
+
+        // First approach using just the "package2Id approach"
+        // options.push(this.createOptionByPackage2Id( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(
+        //                                                                         this.currentPackageDependency.getSubscriberPackageVersionId())
+        //                                             , 'Remove package: ' + dependencyPackageDisplayName ));
+
+        // Second approach using just the "SubscriberPackageVersionId approach"
+        options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId())
+                                                    , 'Remove package dependency ' + dependencyPackageDisplayName 
+                                                    , this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
+
     }
 
     private createSameOptionAsCurrent(options: InquirerOption[]) {
