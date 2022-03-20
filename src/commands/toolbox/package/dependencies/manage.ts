@@ -25,11 +25,14 @@ export default class Manage extends SfdxCommand {
   public static flagsConfig = {
     branch: flags.string({ char: 'b', required: false, description: messages.getMessage('flagBranchDescription') }),
     updatetoreleased: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToReleasedDescription'), exclusive: ['updatetolatest'] }),
-    updatetolatest: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToLatestDescription'), exclusive: ['updatetoreleased']})
+    updatetolatest: flags.boolean({ default: false, required: false, description: messages.getMessage('flagUpdateToLatestDescription'), exclusive: ['updatetoreleased']}),
+    pathtopackageinfosfromdevhuboverride: flags.string({required: false, hidden: true, description: messages.getMessage('flagPathToPackageInfosFromDevHubOverride')}),
+    pathtopackageversioninfosfromdevhuboverride: flags.string({required: false, hidden: true, description: messages.getMessage('flagPathToPackageVersionInfosFromDevHubOverride')})
   };
 
   // Comment this out if your command does not require an org username
-  // protected static requiresUsername = true;
+  protected static supportsUsername = false;
+  protected static requiresUsername = false;
 
   // Comment this out if your command does not support a hub org username
   protected static supportsDevhubUsername = true;
@@ -46,7 +49,9 @@ export default class Manage extends SfdxCommand {
 
     const theSfdxProject = await SfdxProjects.getInstance(this.project, this.ux);
 
-    const theDevHubDependencies = await DevHubDependencies.getInstance(this.hubOrg, this.ux);
+    // console.log('this.flags.pathtopackageinfosfromdevhuboverride == ' + this.flags.pathtopackageinfosfromdevhuboverride);
+    // console.log('this.flags.pathtopackageversioninfosfromdevhuboverride == ' + this.flags.pathtopackageversioninfosfromdevhuboverride);
+    const theDevHubDependencies = await DevHubDependencies.getInstance(this.hubOrg, this.ux, this.flags.pathtopackageinfosfromdevhuboverride, this.flags.pathtopackageversioninfosfromdevhuboverride);
 
     const packageDependencyChangeMap: Map<string, ProjectDependencyChange[]> = new Map<string, ProjectDependencyChange[]>();
 
