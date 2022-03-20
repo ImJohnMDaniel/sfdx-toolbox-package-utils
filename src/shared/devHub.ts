@@ -6,14 +6,27 @@ import { InquirerOption } from '../types/inquirer_option';
 import { ProjectPackageDirectoryDependency } from '../types/project_package_directory_dependency';
 import forcePackageCommand = require('./forceCommands/force_package');
 import { Utils } from './utils';
+import { readFileSync } from 'fs';
 
 export class DevHubDependencies {
 
-    public static async getInstance(thisDevHubOrg: Org, thisUx: UX) {
+    public static async getInstance(thisDevHubOrg: Org, thisUx: UX, pathToPackageInfosFromDevHubOverride: string, pathToPackageVersionInfosFromDevHubOverride: string) {
+
         // get all of the package information from the DevHub
-        const allPackageInfosFromDevHub = await forcePackageCommand.retrieveAllPackageInfo(thisDevHubOrg, thisUx);
+        const allPackageInfosFromDevHub = pathToPackageInfosFromDevHubOverride
+                                            ? await JSON.parse(readFileSync(pathToPackageInfosFromDevHubOverride, 'utf-8')).result as DevHubPackage[]
+                                            : await forcePackageCommand.retrieveAllPackageInfo(thisDevHubOrg, thisUx);
+        // const allPackageInfosFromDevHub = await forcePackageCommand.retrieveAllPackageInfo(thisDevHubOrg, thisUx);
+        // console.log('-----------------------');
+        // console.log('pathToPackageInfosFromDevHubOverride = ' + pathToPackageInfosFromDevHubOverride);
+        // console.log('-----------------------');
+        // console.log(allPackageInfosFromDevHub);
+        // console.log('-----------------------');
         // get all of the package version information from the DevHub
-        const allPackageVersionInfosFromDevHub = await forcePackageCommand.retrieveAllPackageVersionInfo(thisDevHubOrg, thisUx);
+        const allPackageVersionInfosFromDevHub = pathToPackageVersionInfosFromDevHubOverride
+                                                    ? await JSON.parse(readFileSync(pathToPackageVersionInfosFromDevHubOverride, 'utf-8')).result as DevHubPackageVersion[]
+                                                    : await forcePackageCommand.retrieveAllPackageVersionInfo(thisDevHubOrg, thisUx);
+        // const allPackageVersionInfosFromDevHub = await forcePackageCommand.retrieveAllPackageVersionInfo(thisDevHubOrg, thisUx);
         // return a new instance of the DevHubDependencies primed with info that it needs
         return new DevHubDependencies(thisUx, allPackageInfosFromDevHub, allPackageVersionInfosFromDevHub);
     }
