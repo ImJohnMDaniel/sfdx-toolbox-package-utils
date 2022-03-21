@@ -12,7 +12,7 @@ yarn.lock
 oclif.manifest.json
 npm-shrinkwrap.json
 /.history
-/.vscode/settings.json
+/.vscode
 /referencedxproject/.sfdx
 /referencedxproject/temp
 /stuff
