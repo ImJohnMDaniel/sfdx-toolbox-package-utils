@@ -240,16 +240,29 @@ export class DevHubDependencies {
 //      What I know at this point is
 //      - the current package version -- the 04t and the alias
 //      - the dependencyPackageDisplayName
-
+        console.log('---------------------------------');
+        console.log('this.currentPackageDependency == ');
+        console.log(this.currentPackageDependency);
+        console.log('---------------------------------');
         // First approach using just the "package2Id approach"
-        // options.push(this.createOptionByPackage2Id( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(
-        //                                                                         this.currentPackageDependency.getSubscriberPackageVersionId())
-        //                                             , 'Remove package: ' + dependencyPackageDisplayName ));
+        if ( this.currentPackageDependency.getPackage2Id() ) {
+// *********************************************************************************************************************** NEXT STEP
+// 
+// *******************  Probably need to encapsultate the logic found in createNonPinnedSameMajorMinorPatchVersion 
+//                          that gets the current block from the Package2Id so that this new method could also be
+//                          called here as well.
+//
+// *********************************************************************************************************************** NEXT STEP
+            options.push(this.createOptionByPackage2Id( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(
+                                                                                    this.currentPackageDependency.getSubscriberPackageVersionId())
+                                                        , 'Remove package: ' + dependencyPackageDisplayName ));
+
+        }
 
         // Second approach using just the "SubscriberPackageVersionId approach"
         options.push(this.createOptionBySubscriberPackageVersionId( this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId())
                                                     , 'Remove package dependency ' + dependencyPackageDisplayName 
-                                                    , this.devHubPackageVersionInfosBySubscriberPackageVersionMap.get(this.currentPackageDependency.getSubscriberPackageVersionId()).Branch));
+                                                    , null));
 
     }
 
