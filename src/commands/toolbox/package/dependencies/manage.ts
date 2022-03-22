@@ -103,9 +103,11 @@ export default class Manage extends SfdxCommand {
             if ( isDependencyIgnored ) {
               dependencyPackageChoices = theDevHubDependencies.prepareSameDependencyOptionForCurrentDependency();
             } else if (isInteractiveMode) {
+              //
               dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
             } else {
               if ( this.flags.updatetoreleased ) {
+                //
                 dependencyPackageChoices = theDevHubDependencies.prepareRelatedReleasedDependencyOptionsForCurrentDependency();
               } else if (this.flags.updatetolatest) {
                 dependencyPackageChoices = theDevHubDependencies.prepareRelatedNonPinnedDependencyOptionsForCurrentDependency();
