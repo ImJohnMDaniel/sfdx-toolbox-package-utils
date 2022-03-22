@@ -233,9 +233,10 @@ export class DevHubDependencies {
         this.logger('devHub.createNonPinnedSameMajorMinorPatchVersion method called');
         // console.log('createNonPinnedSameMajorMinorPatchVersion starts');
 
-        // find the latest released version
-        const latestReleaseOptions = [] as InquirerOption[];
-        this.findLatestBuildReleased(latestReleaseOptions, false);
+        // ?????: I am commenting this section out for now as, upon review, I am not certain why it is here.  
+        // // find the latest released version
+        // const latestReleaseOptions = [] as InquirerOption[];
+        // this.findLatestBuildReleased(latestReleaseOptions, false);
 
         // assemble the version number
         let versionNumber = this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber();
