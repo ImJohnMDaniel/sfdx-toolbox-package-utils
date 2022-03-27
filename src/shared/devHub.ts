@@ -82,9 +82,9 @@ export class DevHubDependencies {
         return options;
     }
 
-    public prepareRelatedReleasedDependencyOptionsForCurrentDependency(): InquirerOption[] {
+    public prepareRelatedReleasedDependencyOptionsForCurrentDependency(branchNamesThatContainReleasedVersions?: string[]): InquirerOption[] {
         const options: InquirerOption[] = [];
-        this.findLatestBuildReleased(options, true);
+        this.findLatestBuildsReleased(options, branchNamesThatContainReleasedVersions, true);
         return options;
     }
 
@@ -94,7 +94,7 @@ export class DevHubDependencies {
         return options;
     }
 
-    public prepareRelatedDependencyOptionsForCurrentDependency(): InquirerOption[] {
+    public prepareRelatedDependencyOptionsForCurrentDependency(branchNamesThatContainReleasedVersions?: string[]): InquirerOption[] {
         // TODO: implement "Is there a newer Major version available?"
         // There is a distinction between "next available version" and "next avaialble released version"
         // There is a distinction between "the base/null branch" verses the "feature branch" that is coming from Branch flag
@@ -109,38 +109,44 @@ export class DevHubDependencies {
         //  if there is a release version then we will hold adding that to the options array until later 
         //  but the other find requests will 
         // Is there a released version that is available on the main branch?
-        this.findLatestBuildReleased(onlyLatestBuildReleasedOptions, true, versionsFound);
+        this.findLatestBuildsReleased(onlyLatestBuildReleasedOptions, branchNamesThatContainReleasedVersions, true, versionsFound);
         this.logger(onlyLatestBuildReleasedOptions.length);
+        this.logger('mark 2B');
         this.logger(options.length);
-
         // What is the latest build version on the branch regardless of Major.Minor.Patch numbers?
         this.findLatestCurrentBranchBuilderVersion(options, versionsFound);
+        this.logger('mark 2C');
         this.logger(options.length);
-
         // Is there a newer Major.Minor.Patch version availble?
-        this.findLatestMainBranchBuildSameMajorMinorPatchVersion(options, versionsFound);
+        this.findLatestMainBranchBuildSameMajorMinorPatchVersion(options, branchNamesThatContainReleasedVersions, versionsFound);
+        this.logger('mark 2D');
         this.logger(options.length);
-
         // Is there a newer Major.Minor version availble?
-        this.findLatestMainBranchBuildSameMajorMinorVersion(options, versionsFound);
+        this.findLatestMainBranchBuildSameMajorMinorVersion(options, branchNamesThatContainReleasedVersions, versionsFound);
+        this.logger('mark 2E');
         this.logger(options.length);
-        
         // Is there a newer Major version availble?
-        this.findLatestMainBranchBuildVersion(options, versionsFound);
+        this.findLatestMainBranchBuildVersion(options, branchNamesThatContainReleasedVersions, versionsFound);
+        this.logger('mark 2F');
         this.logger(options.length);
-
         // add the onlyLatestBuildReleasedOptions, if available
         if ( onlyLatestBuildReleasedOptions.length > 0 ) {
-            options.push(onlyLatestBuildReleasedOptions[0]);
+            // options.push(onlyLatestBuildReleasedOptions[0]);
+            onlyLatestBuildReleasedOptions.forEach((onlyLatestBuildReleasedOption: InquirerOption) => {
+                options.push(onlyLatestBuildReleasedOption);
+            });
+            this.logger('mark 2.5A');
             this.logger(options.length);
         }
         
         // Create "package@CurrentMajor.CurrentMinor.CurrentPatch-LATEST" version entry
         this.createNonPinnedSameMajorMinorPatchVersion(options);
+        this.logger('mark 2G');
         this.logger(options.length);
 
         // Create an option to keep the current version specified in the sfdx-project.json
         this.createSameOptionAsCurrent(options);
+        this.logger('mark 2H');
         this.logger(options.length);
 
         return options;
@@ -267,55 +273,79 @@ export class DevHubDependencies {
         // console.log('createNonPinnedSameMajorMinorPatchVersion finishes');
     }
 
-    private findLatestMainBranchBuildSameMajorMinorVersion(options: InquirerOption[], versionsFound: Set<String>) {
+    private findVersion(options: InquirerOption[], versionsFound: Set<String>, chunkLevel: CHUNK_LEVEL, branchName: string) {
+        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, chunkLevel, branchName);
+        const branchNameFullSnippet = branchName ? 'build branch - ' + branchName : 'main build branch';
+        let versionTypeSnippet = 'major';
+        if ( chunkLevel >= CHUNK_LEVEL.MINOR ) {
+            if ( chunkLevel == CHUNK_LEVEL.MINOR ) {
+                versionTypeSnippet += ' and minor';
+            } else {
+                versionTypeSnippet += ', minor';
+            }
+        }
+        if ( chunkLevel >= CHUNK_LEVEL.PATCH ) {
+            versionTypeSnippet += ', and patch';
+        }
+        versionTypeSnippet += ' version';
+
+        let versionNumberSnippet = 'Latest';
+        if ( chunkLevel > CHUNK_LEVEL.MAJOR ) {
+            versionNumberSnippet += this.currentPackageDependency.getMajorVersionNumber();
+        }
+        if ( chunkLevel >= CHUNK_LEVEL.MINOR ) {
+            versionNumberSnippet += '.' + this.currentPackageDependency.getMinorVersionNumber();
+        }
+        if ( chunkLevel >= CHUNK_LEVEL.PATCH ) {
+            versionNumberSnippet += '.' + this.currentPackageDependency.getPatchVersionNumber();
+        }
+
+        if (currentBuildBlock) {
+            const devhubPackageVersion = this.findLatestBuildFromBlock(currentBuildBlock);
+            if ( ! versionsFound.has(devhubPackageVersion.SubscriberPackageVersionId) ) {
+                versionsFound.add(devhubPackageVersion.SubscriberPackageVersionId);
+                options.push(this.createOptionBySubscriberPackageVersionId(devhubPackageVersion
+                            , versionNumberSnippet
+                                + ' version on ' + branchNameFullSnippet
+                            , branchName));
+            } else {
+                this.ux.log('    -- Latest build on same ' + versionTypeSnippet + ' on the '
+                                + branchNameFullSnippet + ' included in options already');
+            }
+        } else {
+            this.ux.log('    -- No option found for latest build on same ' + versionTypeSnippet + ' on the ' 
+                                + branchNameFullSnippet);
+        }
+    }
+
+    private findLatestMainBranchBuildSameMajorMinorVersion(options: InquirerOption[], branchNamesThatContainReleasedVersions: string[], versionsFound: Set<String>) {
         this.logger('devHub.findLatestMainBranchBuildSameMajorMinorVersion method called');
-        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MINOR, '');
-        
-        if (currentBuildBlock) {
-            const devhubPackageVersion = this.findLatestBuildFromBlock(currentBuildBlock);
-            if ( ! versionsFound.has(devhubPackageVersion.SubscriberPackageVersionId) ) {
-                versionsFound.add(devhubPackageVersion.SubscriberPackageVersionId);
-                options.push(this.createOptionBySubscriberPackageVersionId(devhubPackageVersion, 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + ' version on main build branch', this.currentBranch));
-            } else {
-                this.ux.log('    -- Latest build on same major and minor version on the main build branch included in options already');
-            }
-        } else {
-            this.ux.log('    -- No option found for latest build on same major and minor version on the main build branch');
+        this.findVersion( options, versionsFound, CHUNK_LEVEL.MINOR, undefined);
+        if ( branchNamesThatContainReleasedVersions ) {
+            branchNamesThatContainReleasedVersions.forEach((branchName: string) => {
+                this.findVersion( options, versionsFound, CHUNK_LEVEL.MINOR, branchName);
+            });
         }
+
     }
 
-    private findLatestMainBranchBuildSameMajorMinorPatchVersion(options: InquirerOption[], versionsFound: Set<String>) {
+    private findLatestMainBranchBuildSameMajorMinorPatchVersion(options: InquirerOption[], branchNamesThatContainReleasedVersions: string[], versionsFound: Set<String>) {
         this.logger('devHub.findLatestMainBranchBuildSameMajorMinorPatchVersion method called');
-        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.PATCH, '');
-
-        if (currentBuildBlock) {
-            const devhubPackageVersion = this.findLatestBuildFromBlock(currentBuildBlock);
-            if ( ! versionsFound.has(devhubPackageVersion.SubscriberPackageVersionId) ) {
-                versionsFound.add(devhubPackageVersion.SubscriberPackageVersionId);
-                options.push(this.createOptionBySubscriberPackageVersionId(devhubPackageVersion, 'Latest ' + this.currentPackageDependency.getMajorVersionNumber() + '.' + this.currentPackageDependency.getMinorVersionNumber() + '.' + this.currentPackageDependency.getPatchVersionNumber() + ' version on main build branch', this.currentBranch));
-            } else {
-                this.ux.log('    -- Latest build on same major, minor, and patch version on the main build branch included in options already');
-            }
-        } else {
-            this.ux.log('    -- No option found for latest build on same major, minor, and patch version on the main build branch');
+        this.findVersion( options, versionsFound, CHUNK_LEVEL.PATCH, undefined);
+        if ( branchNamesThatContainReleasedVersions ) {
+            branchNamesThatContainReleasedVersions.forEach((branchName: string) => {
+                this.findVersion( options, versionsFound, CHUNK_LEVEL.PATCH, branchName);
+            });
         }
     }
 
-
-    private findLatestMainBranchBuildVersion(options: InquirerOption[], versionsFound: Set<String>) {
+    private findLatestMainBranchBuildVersion(options: InquirerOption[], branchNamesThatContainReleasedVersions: string[], versionsFound: Set<String>) {
         this.logger('devHub.findLatestMainBranchBuildVersion method called');
-        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
-
-        if (currentBuildBlock) {
-            const devhubPackageVersion = this.findLatestBuildFromBlock(currentBuildBlock);
-            if ( ! versionsFound.has(devhubPackageVersion.SubscriberPackageVersionId) ) {
-                versionsFound.add(devhubPackageVersion.SubscriberPackageVersionId);
-                options.push(this.createOptionBySubscriberPackageVersionId(devhubPackageVersion, 'Latest version on main build branch', undefined));
-            } else {
-                this.ux.log('    -- Latest build on the main build branch included in options already');
-            }
-        } else {
-            this.ux.log('    -- No option found for latest build on the main build branch');
+        this.findVersion( options, versionsFound, CHUNK_LEVEL.MAJOR, undefined);
+        if ( branchNamesThatContainReleasedVersions ) {
+            branchNamesThatContainReleasedVersions.forEach((branchName: string) => {
+                this.findVersion( options, versionsFound, CHUNK_LEVEL.MAJOR, branchName);
+            });
         }
     }
     
@@ -338,19 +368,35 @@ export class DevHubDependencies {
         }
     }
 
-    private findLatestBuildReleased(options: InquirerOption[], isLoggingToUX?: boolean, versionsFound?: Set<String>) {
-        this.logger('devHub.findLatestBuildReleased method called');
-        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosReleasedByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, '');
+    private findLatestBuildsReleased(options: InquirerOption[], branchNamesThatContainReleasedVersions: string[], isLoggingToUX?: boolean, versionsFound?: Set<String>) {
+        this.logger('devHub.findLatestBuildsReleased method called');
+        // find the latest build released on branch null
+        this.findLatestBuildReleasedForBranch(options, '', isLoggingToUX, versionsFound);
+        // find the latest build released on each of the branchNamesThatContainReleasedVersions
+        if ( branchNamesThatContainReleasedVersions ) {
+            branchNamesThatContainReleasedVersions.forEach((branchName: string) => {
+                this.findLatestBuildReleasedForBranch(options, branchName, isLoggingToUX, versionsFound);
+            });
+        }
+    }
 
+    private findLatestBuildReleasedForBranch(options: InquirerOption[], branchName: string, isLoggingToUX?: boolean, versionsFound?: Set<String>) {
+        const currentBuildBlock = this.findBlock(this.devHubPackageVersionInfosReleasedByPackageAndBranchMap, CHUNK_LEVEL.MAJOR, branchName);
+
+        const optionMessage = branchName ? 'Latest released version on build branch - ' + branchName
+                                        : 'Latest released version on main build branch';
+        const noOptionMessage = branchName ? '    -- No option found for released version build on build branch - ' + branchName
+                                        :  '    -- No option found for released version build on main build branch';
+        
         if (currentBuildBlock) {
             const devhubPackageVersion = this.findLatestBuildFromBlock(currentBuildBlock);
             if ( versionsFound ) {
                 versionsFound.add(devhubPackageVersion.SubscriberPackageVersionId);
             }
-            options.push(this.createOptionBySubscriberPackageVersionId(devhubPackageVersion, 'Latest released version on main build branch', undefined));
+            options.push(this.createOptionBySubscriberPackageVersionId(devhubPackageVersion, optionMessage, branchName));
         } else {
             if ( isLoggingToUX ) {
-                this.ux.log('    -- No option found for released version build on main build branch');
+                this.ux.log(noOptionMessage);
             }
         }
     }
