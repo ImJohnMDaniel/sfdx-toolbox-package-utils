@@ -1,75 +1,36 @@
 {
   "packageDirectories": [
-      {
-          "path": "sfdx-source/core",
-          "default": true,
-          "dependencies": [
-              {
-                  "package": "x103.framework-globals",
-                  "versionNumber": "0.1.0.LATEST"
-              },
-              {
-                  "package": "x103.framework",
-                  "versionNumber": "0.1.0.LATEST"
-              },
-              {
-                  "package": "referencePackageA",
-                  "versionNumber": "0.1-LATEST"
-              },
-              {
-                  "package": "referencePackageB",
-                  "versionNumber": "0.1.0.LATEST"
-              }
-          ]
-      },
-      {
-          "path": "sfdx-source/unpackaged",
-          "default": false
-      }
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "Legacy",
+      "versionNumber": "1.0.0.NEXT",
+      "dependencies": [
+        {
+          "package": "fflib-apex-mocks@1.4.0-1"
+        },
+        {
+          "package": "fflib-apex-common@1.2.0-1"
+        }
+      ]
+    }
   ],
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "54.0",
-  "packageAliases": {
-      "referencePackageA": "0Ho1T000000GmaOSAS",
-      "referencePackageB": "0Ho1T000000GmaTSAS",
-      "x103.framework": "0Ho1T000000XZAbSAO",
-      "x103.framework-globals": "0Ho1T000000XZAgSAO"
-  },
-  "otherExamples": [
-      {
-          "dependencies": [
-              {
-                  "package": "referencePackageA",
-                  "versionNumber": "0.LATEST"
-              },
-              {
-                  "package": "x103.framework",
-                  "versionNumber": "0.1.0-LATEST"
-              },
-              {
-                  "package": "x103.framework-globals@0.1.0.1"
-              },
-              {
-                  "package": "04t1T000000V9beQAC"
-              },
-              {
-                  "package": "referencePackageA",
-                  "versionNumber": "0.1-LATEST"
-              },
-              {
-                  "package": "0Ho1T000000GmaTSAS",
-                  "versionNumber": "0.1-LATEST"
-              },
-              {
-                  "package": "0Ho1T000000GmaTSAS",
-                  "versionNumber": "100.1-LATEST"
-              },
-              {
-                  "package": "referencePackageA",
-                  "versionNumber": "0.1.0.2"
-              }
-          ]
+  "sourceApiVersion": "53.0",
+  "plugins": {
+    "toolbox": {
+      "package": {
+        "brancheswithreleasedversions": [
+          "bluefish"
+        ]
       }
-  ]
+    }
+  },
+  "packageAliases": {
+    "fflib-apex-mocks@1.4.0-1": "04t7R0000018hxeQAA",
+    "fflib-apex-common@1.2.0-1": "04t7R0000018hyXQAQ",
+    "fflib-apex-mocks": "0Ho7R000000fxUCSAY",
+    "fflib-apex-common": "0Ho7R000000fxU7SAI"
+  }
 }

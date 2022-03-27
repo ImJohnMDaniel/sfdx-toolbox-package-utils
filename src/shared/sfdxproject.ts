@@ -230,6 +230,14 @@ export class SfdxProjects {
         return outputMap;
     }
 
+    public getProjectDependenciesToIgnore(): string[] {
+        return _.get(this.sfdxProjectJson, 'plugins.toolbox.dependencies.ignore', false) as string[];
+    }
+
+    public getBranchNamesThatContainReleasedVersions(): string[] {
+        return _.get(this.sfdxProjectJson['contents'], 'plugins.toolbox.package.brancheswithreleasedversions', false) as string[];
+    }
+
     private resolveDependencyAliases( dependency: AnyJson ): AnyJson {
         if ( Object.keys(dependency).find(item => item === 'package') ) {
             dependency['package'] = this.resolveAlias(dependency['package']);

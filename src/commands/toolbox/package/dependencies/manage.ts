@@ -55,8 +55,9 @@ export default class Manage extends SfdxCommand {
 
     const packageDependencyChangeMap: Map<string, ProjectDependencyChange[]> = new Map<string, ProjectDependencyChange[]>();
 
-    const projectJson = await this.project.retrieveSfdxProjectJson();
-    let dependenciesToIgnore = _.get(projectJson['contents'], 'plugins.toolbox.dependencies.ignore', false) as string[];
+    const dependenciesToIgnore = theSfdxProject.getProjectDependenciesToIgnore();
+
+    const branchNamesThatContainReleasedVersions = theSfdxProject.getBranchNamesThatContainReleasedVersions();
 
     const evaluateOptions = async () => {
       let aProjectDependencyChange: ProjectDependencyChange;
@@ -103,10 +104,12 @@ export default class Manage extends SfdxCommand {
             if ( isDependencyIgnored ) {
               dependencyPackageChoices = theDevHubDependencies.prepareSameDependencyOptionForCurrentDependency();
             } else if (isInteractiveMode) {
-              dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency();
+              //
+              dependencyPackageChoices = theDevHubDependencies.prepareRelatedDependencyOptionsForCurrentDependency(branchNamesThatContainReleasedVersions);
             } else {
               if ( this.flags.updatetoreleased ) {
-                dependencyPackageChoices = theDevHubDependencies.prepareRelatedReleasedDependencyOptionsForCurrentDependency();
+                //
+                dependencyPackageChoices = theDevHubDependencies.prepareRelatedReleasedDependencyOptionsForCurrentDependency(branchNamesThatContainReleasedVersions);
               } else if (this.flags.updatetolatest) {
                 dependencyPackageChoices = theDevHubDependencies.prepareRelatedNonPinnedDependencyOptionsForCurrentDependency();
               }
