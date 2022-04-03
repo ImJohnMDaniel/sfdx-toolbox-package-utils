@@ -345,7 +345,7 @@ export class DevHubDependencies {
         }
         versionTypeSnippet += ' version';
 
-        let versionNumberSnippet = 'Latest';
+        let versionNumberSnippet = 'Latest ';
         if ( chunkLevel > CHUNK_LEVEL.MAJOR ) {
             versionNumberSnippet += this.currentPackageDependency.getMajorVersionNumber();
         }
