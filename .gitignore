@@ -14,5 +14,6 @@ npm-shrinkwrap.json
 /.history
 /.vscode
 /referencedxproject/.sfdx
+/referencedxproject/.sf
 /referencedxproject/temp
 /stuff
