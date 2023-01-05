@@ -231,7 +231,7 @@ export class SfdxProjects {
     }
 
     public getProjectDependenciesToIgnore(): string[] {
-        return _.get(this.sfdxProjectJson, 'plugins.toolbox.dependencies.ignore', false) as string[];
+        return _.get(this.sfdxProjectJson['contents'], 'plugins.toolbox.dependencies.ignore', false) as string[];
     }
 
     public getBranchNamesThatContainReleasedVersions(): string[] {
