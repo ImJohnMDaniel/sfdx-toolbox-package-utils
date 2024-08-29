@@ -14,14 +14,14 @@ Utilities to better manage SalesforceDX Packages
 ### **Install as a SalesforceDX Plugin**
 
 ```  
-sfdx plugins:install @dx-cli-toolbox/sfdx-toolbox-package-utils
+sf plugins install @dx-cli-toolbox/sfdx-toolbox-package-utils
 ```
 You will be prompted to confirm that you want to install an unsigned plugin. Choose "yes"
 ```  
 This plugin is not digitally signed and its authenticity cannot be verified. Continue installation y/n?: y
 ```
 
-To whitelist this plugin, [add an entry for it in $HOME/.config/sfdx/unsignedPluginWhiteList.json](https://developer.salesforce.com/blogs/2017/10/salesforce-dx-cli-plugin-update.html).
+To allowlist this plugin, [add an entry for it in $HOME/.config/sf/unsignedPluginAllowList.json](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_allowlist.htm).
 
 ### **Install from source**
 1. Clone the repository
@@ -30,20 +30,20 @@ git clone https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils.git
 ```
 2. Link the plugin:
 ```
-sfdx plugins:link .
+sf plugins link .
 ```
 # Commands
 <!-- commands -->
-* [`sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-t DeprecateOnly|Mixed|Delete] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesinstall--a-allpackage--b-string---dryrun--k-string---noprecheck--p--s-allusersadminsonly--t-deprecateonlymixeddelete--w-number--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx toolbox:package:dependencies:manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesmanage--b-string---updatetoreleased----updatetolatest--v-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sf toolbox package dependencies install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-t DeprecateOnly|Mixed|Delete] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesinstall--a-allpackage--b-string---dryrun--k-string---noprecheck--p--s-allusersadminsonly--t-deprecateonlymixeddelete--w-number--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sf toolbox package dependencies manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-toolboxpackagedependenciesmanage--b-string---updatetoreleased----updatetolatest--v-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-t DeprecateOnly|Mixed|Delete] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sf toolbox package dependencies install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] [-p] [-s AllUsers|AdminsOnly] [-t DeprecateOnly|Mixed|Delete] [-w <number>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Install dependent packages for a sfdx project
+Install dependent packages for a sf project
 
 ```
 USAGE
-  $ sfdx toolbox:package:dependencies:install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] 
+  $ sf toolbox package dependencies install [-a all|package] [-b <string>] [--dryrun] [-k <string>] [--noprecheck] 
   [-p] [-s AllUsers|AdminsOnly] [-t DeprecateOnly|Mixed|Delete] [-w <number>] [-v <string>] [-u <string>] [--apiversion 
   <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
@@ -100,13 +100,13 @@ EXAMPLE
 
 _See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.8.4/src/commands/toolbox/package/dependencies/install.ts)_
 
-## `sfdx toolbox:package:dependencies:manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sf toolbox package dependencies manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Manage the sfdx project dependencies
+Manage the sf project dependencies
 
 ```
 USAGE
-  $ sfdx toolbox:package:dependencies:manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] 
+  $ sf toolbox package dependencies manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] 
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -133,10 +133,10 @@ OPTIONS
                                                                                     version
 
 EXAMPLE
-  $ sfdx toolbox:package:dependencies:manage --branch my-feature-branch --targetdevhubusername devhub@org.com
-  $ sfdx toolbox:package:dependencies:manage --branch my-feature-branch --updatetolatest --targetdevhubusername 
+  $ sf toolbox package dependencies manage --branch my-feature-branch --targetdevhubusername devhub@org.com
+  $ sf toolbox package dependencies manage --branch my-feature-branch --updatetolatest --targetdevhubusername 
   devhub@org.com
-  $ sfdx toolbox:package:dependencies:manage --branch my-feature-branch --updatetoreleased --targetdevhubusername 
+  $ sf toolbox package dependencies manage --branch my-feature-branch --updatetoreleased --targetdevhubusername 
   devhub@org.com
 ```
 
