@@ -1,7 +1,7 @@
 {
   "packageDirectories": [
     {
-      "path": "force-app",
+      "path": "sfdx-source/untracked",
       "default": true,
       "package": "Legacy",
       "versionNumber": "1.0.0.NEXT",
@@ -17,20 +17,18 @@
   ],
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "53.0",
+  "sourceApiVersion": "62.0",
   "plugins": {
     "toolbox": {
       "package": {
-        "brancheswithreleasedversions": [
-          "bluefish"
-        ]
+        "brancheswithreleasedversions": ["bluefish"]
       }
     }
   },
   "packageAliases": {
     "fflib-apex-mocks@1.4.0-1": "04t7R0000018hxeQAA",
     "fflib-apex-common@1.2.0-1": "04t7R0000018hyXQAQ",
-    "fflib-apex-mocks": "0Ho7R000000fxUCSAY",
-    "fflib-apex-common": "0Ho7R000000fxU7SAI"
+    "reference-fflib-apex-mocks": "0Ho1T000000PAsXSAW",
+    "reference-fflib-apex-common": "0Ho1T000000PAscSAG"
   }
 }

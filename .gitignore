@@ -1,19 +1,68 @@
+# -- CLEAN
+temp/
+tmp/
+# use yarn by default, so ignore npm
+package-lock.json
+
+# never checkin npm config
+.npmrc
+
+# debug logs
+npm-error.log
+yarn-error.log
 *-debug.log
 *-error.log
-/.nyc_output
-/dist
-/lib
-/package-lock.json
-/tmp
-/temp
-node_modules
-.DS_Store
-yarn.lock
-oclif.manifest.json
+
+# compile source
+lib
+
+# test artifacts
+*xunit.xml
+*checkstyle.xml
+*unitcoverage
+.nyc_output
+coverage
+test_session*
+
+# generated docs
+docs
+
+# ignore sfdx-trust files
+*.tgz
+*.sig
+package.json.bak.
+
+
 npm-shrinkwrap.json
-/.history
+oclif.manifest.json
+oclif.lock
+
+# -- CLEAN ALL
+*.tsbuildinfo
+.eslintcache
+.wireit
+node_modules
+
+# --
+# put files here you don't want cleaned with sf-clean
+
+# os specific files
+.DS_Store
+.idea
+
+
+
+
+
+# Salesforce CLI specific
+.sfdx/
+.sf/
+
+# VSCode Related folders
 /.vscode
-/referencedxproject/.sfdx
-/referencedxproject/.sf
-/referencedxproject/temp
-/stuff
+.history/
+
+# Reference Projects
+/referenceproject/sfdx-source/untracked
+!/referenceproject/sfdx-source/untracked/README.md
+/referenceproject/temp
