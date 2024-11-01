@@ -98,7 +98,7 @@ EXAMPLE
   $ toolbox:package:dependencies:install -u MyScratchOrg -v MyDevHub -k "1:MyPackage1Key 2: 3:MyPackage3Key" -b "DEV"
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.8.4/src/commands/toolbox/package/dependencies/install.ts)_
+_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v1.0.0-alpha1/src/commands/toolbox/package/dependencies/install.ts)_
 
 ## `sfdx toolbox:package:dependencies:manage [-b <string>] [--updatetoreleased | --updatetolatest] [-v <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -140,5 +140,5 @@ EXAMPLE
   devhub@org.com
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/manage.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v0.8.4/src/commands/toolbox/package/dependencies/manage.ts)_
+_See code: [src/commands/toolbox/package/dependencies/manage.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/v1.0.0-alpha1/src/commands/toolbox/package/dependencies/manage.ts)_
 <!-- commandsstop -->
