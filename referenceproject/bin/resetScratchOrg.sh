@@ -4,7 +4,7 @@ devhub_org_alias=$1
 
 devhub_string=blue
 
-if ! [ -z "$devhub_org_alias" ]
+if [ -n "$devhub_org_alias" ]
   then
     echo devhub_org_alias is $devhub_org_alias
     devhub_string="--target-dev-hub $devhub_org_alias"
