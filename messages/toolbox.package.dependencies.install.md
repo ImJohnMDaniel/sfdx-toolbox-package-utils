@@ -1,10 +1,10 @@
 # summary
 
-Install package dependencies for a Salesforce project.
+Installs package dependencies for a Salesforce project.
 
 # description
 
-Installs all specified package dependencies in a Salesforce DX project using the sfdx-project.json definition.
+Installs package dependencies for a Salesforce project specified in the sfdx-project.json file.
 
 # flags.branch.summary
 
@@ -34,13 +34,21 @@ Install all packages or only deltas.
 
 If 'All' is specified, then all packages specified in package dependencies are installed, regardless of if the version already is installed in the org. If 'Delta' is specified, then only packages that differ from what is installed in the org will be installed.
 
+# flags.no-precheck.summary
+
+Bypass the pre-check of the target org and force install all packages.
+
+# flags.no-precheck.description
+
+Allows the command to bypass the pre-check of the target org and force install all packages even if they are already installed.
+
 # flags.installation-key.summary
 
 Installation key for key-protected packages
 
 # flags.installation-key.description
 
-Installation key for key-protected packages in the key:value format of SubscriberPackageVersionId:Key
+Installation key for key-protected packages in the key:value format of SubscriberPackageVersionId:Key. Specify multiple "--installation-key" flags for more than one key
 
 # flags.no-prompt.summary
 
@@ -56,7 +64,7 @@ Maximum number of minutes to wait for the Subscriber Package Version ID to becom
 
 # flags.security-type.summary
 
-Security access type for the installed package. (deprecation notice: The default --security-type value will change from AllUsers to AdminsOnly in v47.0 or later.)
+Security access type for the installed package.
 
 # flags.skip-handlers.summary
 

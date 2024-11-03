@@ -25,7 +25,10 @@ import {
 type PackageInstallRequest = PackagingSObjects.PackageInstallRequest;
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const messages = Messages.loadMessages('@dx-cli-toolbox/sfdx-toolbox-package-utils', 'toolbox.package.dependencies.install');
+const messages = Messages.loadMessages(
+  '@dx-cli-toolbox/sfdx-toolbox-package-utils',
+  'toolbox.package.dependencies.install'
+);
 
 export type PackageToInstall = {
   Status: string;
@@ -107,7 +110,11 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       summary: messages.getMessage('flags.target-dev-hub.summary'),
       char: 'v',
     }),
-    'target-org': Flags.requiredOrg(),
+    'target-org': Flags.requiredOrg({
+      summary: messages.getMessage('flags.target-dev-hub.summary'),
+      aliases: ['blue', 'red'],
+      charAliases: ['b'],
+    }),
     'upgrade-type': Flags.custom<'DeprecateOnly' | 'Mixed' | 'Delete'>({
       options: ['DeprecateOnly', 'Mixed', 'Delete'],
     })({
