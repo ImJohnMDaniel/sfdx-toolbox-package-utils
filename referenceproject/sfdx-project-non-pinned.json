@@ -7,7 +7,8 @@
       "versionNumber": "1.0.0.NEXT",
       "dependencies": [
         {
-          "package": "steampunk-fflib-apex-mocks@1.3.0-2"
+          "package": "fflib-apex-mocks",
+          "versionNumber": "1.3.0-LATEST"
         },
         {
           "package": "steampunk-fflib-apex-common@1.4.0-1"

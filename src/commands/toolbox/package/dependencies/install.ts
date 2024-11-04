@@ -112,8 +112,6 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
     }),
     'target-org': Flags.requiredOrg({
       summary: messages.getMessage('flags.target-dev-hub.summary'),
-      aliases: ['blue', 'red'],
-      charAliases: ['b'],
     }),
     'upgrade-type': Flags.custom<'DeprecateOnly' | 'Mixed' | 'Delete'>({
       options: ['DeprecateOnly', 'Mixed', 'Delete'],
