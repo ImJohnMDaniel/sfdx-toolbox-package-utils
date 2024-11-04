@@ -1,5 +1,4 @@
 # -- CLEAN
-temp/
 tmp/
 # use yarn by default, so ignore npm
 package-lock.json
@@ -50,9 +49,7 @@ node_modules
 .DS_Store
 .idea
 
-
-
-
+temp/
 
 # Salesforce CLI specific
 .sfdx/
