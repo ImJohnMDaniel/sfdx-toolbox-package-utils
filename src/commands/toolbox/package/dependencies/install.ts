@@ -8,7 +8,7 @@ import {
   orgApiVersionFlagWithDeprecations,
   optionalHubFlagWithDeprecations,
 } from '@salesforce/sf-plugins-core';
-import { AuthInfo, Connection, Messages, Lifecycle, SfError } from '@salesforce/core';
+import { Messages, Lifecycle, SfError } from '@salesforce/core';
 import { isPackagingDirectory } from '@salesforce/core/project';
 import { Duration } from '@salesforce/kit';
 import {
@@ -117,7 +117,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
     //   summary: messages.getMessage('flags.target-dev-hub.summary'),
     //   char: 'v',
     // }),
-    'target-dev-hub': optionalHubFlagWithDeprecations
+    'target-dev-hub': optionalHubFlagWithDeprecations,
     // 'target-org': Flags.requiredOrg({
     //   summary: messages.getMessage('flags.target-dev-hub.summary'),
     //   charAliases: ['b'],
