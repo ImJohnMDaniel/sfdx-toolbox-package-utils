@@ -1,7 +1,13 @@
 /* eslint-disable complexity */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unsafe-finally */
-import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
+import {
+  SfCommand,
+  Flags,
+  requiredHubFlagWithDeprecations,
+  requiredOrgFlagWithDeprecations,
+  orgApiVersionFlagWithDeprecations,
+} from '@salesforce/sf-plugins-core';
 import { AuthInfo, Connection, Messages, Lifecycle, SfError } from '@salesforce/core';
 import { isPackagingDirectory } from '@salesforce/core/project';
 import { Duration } from '@salesforce/kit';
@@ -57,7 +63,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       description: messages.getMessage('flags.apex-compile.description'),
       char: 'a',
     }),
-    'api-version': Flags.orgApiVersion(),
+    // 'api-version': Flags.orgApiVersion(),
+    'api-version': orgApiVersionFlagWithDeprecations,
     branch: Flags.string({
       summary: messages.getMessage('flags.branch.summary'),
       description: messages.getMessage('flags.branch.description'),
@@ -106,15 +113,16 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       description: messages.getMessage('flags.skip-handlers.description'),
       hidden: true,
     }),
-    'target-dev-hub': Flags.string({
-      summary: messages.getMessage('flags.target-dev-hub.summary'),
-      char: 'v',
-    }),
-    'target-org': Flags.requiredOrg({
-      summary: messages.getMessage('flags.target-dev-hub.summary'),
-      aliases: ['blue', 'red'],
-      charAliases: ['b'],
-    }),
+    // 'target-dev-hub': Flags.string({
+    //   summary: messages.getMessage('flags.target-dev-hub.summary'),
+    //   char: 'v',
+    // }),
+    'target-dev-hub': requiredHubFlagWithDeprecations,
+    // 'target-org': Flags.requiredOrg({
+    //   summary: messages.getMessage('flags.target-dev-hub.summary'),
+    //   charAliases: ['b'],
+    // }),
+    'target-org': requiredOrgFlagWithDeprecations,
     'upgrade-type': Flags.custom<'DeprecateOnly' | 'Mixed' | 'Delete'>({
       options: ['DeprecateOnly', 'Mixed', 'Delete'],
     })({
