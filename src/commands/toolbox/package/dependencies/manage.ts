@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unsafe-finally */
-import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
+import { SfCommand, Flags, requiredHubFlagWithDeprecations } from '@salesforce/sf-plugins-core';
 import { AuthInfo, Connection, Messages, Lifecycle, SfError, SfProject } from '@salesforce/core';
 import {
     InstalledPackages,
@@ -33,7 +33,7 @@ export default class ToolboxPackageDependenciesManage extends SfCommand<ToolboxP
   
     public static readonly flags = {
         ...SfCommand.baseFlags,
-        'target-dev-hub': requiredHubFlag,
+        'target-dev-hub': requiredHubFlagWithDeprecations,
         ...basePackageDependencyRelatedFlags,
         'update-to-released': Flags.boolean({
             summary: messages.getMessage('flags.update-to-released.summary'),
