@@ -4,9 +4,9 @@
 import {
   SfCommand,
   Flags,
-  requiredHubFlagWithDeprecations,
   requiredOrgFlagWithDeprecations,
   orgApiVersionFlagWithDeprecations,
+  optionalHubFlagWithDeprecations,
 } from '@salesforce/sf-plugins-core';
 import { AuthInfo, Connection, Messages, Lifecycle, SfError } from '@salesforce/core';
 import { isPackagingDirectory } from '@salesforce/core/project';
@@ -117,7 +117,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
     //   summary: messages.getMessage('flags.target-dev-hub.summary'),
     //   char: 'v',
     // }),
-    'target-dev-hub': requiredHubFlagWithDeprecations,
+    'target-dev-hub': optionalHubFlagWithDeprecations
     // 'target-org': Flags.requiredOrg({
     //   summary: messages.getMessage('flags.target-dev-hub.summary'),
     //   charAliases: ['b'],
@@ -142,7 +142,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
   public async run(): Promise<PackageToInstall[]> {
     const { flags } = await this.parse(PackageDependenciesInstall);
 
-    // Authorize to the target org
+    // Create connection to the target org
+    await flags['target-org'].refreshAuth();
     const targetOrgConnection = flags['target-org']?.getConnection(flags['api-version']);
 
     if (!targetOrgConnection) {
@@ -196,11 +197,9 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         throw messages.createError('error.targetDevHubMissing');
       }
 
-      // Initialize the authorization for the provided dev hub
-      const targetDevHubAuthInfo = await AuthInfo.create({ username: flags['target-dev-hub'] });
-
       // Create a connection to the dev hub
-      const targetDevHubConnection = await Connection.create({ authInfo: targetDevHubAuthInfo });
+      await flags['target-dev-hub'].refreshAuth();
+      const targetDevHubConnection = flags['target-dev-hub']?.getConnection(flags['api-version']);
 
       if (!targetDevHubConnection) {
         throw messages.createError('error.targetDevHubConnectionFailed');

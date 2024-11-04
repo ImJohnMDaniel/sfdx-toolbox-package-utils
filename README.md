@@ -5,10 +5,10 @@ Utilities to better manage SalesforceDX Packages
 # Contents
 
 <!-- toc -->
-
-- [Contents](#contents)
-- [Setup](#setup)
-- [Commands](#commands)
+* [@dx-cli-toolbox/sfdx-toolbox-package-utils](#dx-cli-toolboxsfdx-toolbox-package-utils)
+* [Contents](#contents)
+* [Setup](#setup)
+* [Commands](#commands)
 <!-- tocstop -->
 
 # Setup
@@ -44,9 +44,8 @@ sfdx plugins:link .
 # Commands
 
 <!-- commands -->
-
-- [`sf toolbox package dependencies install`](#sf-toolbox-package-dependencies-install)
-- [`sf toolbox package version cleanup`](#sf-toolbox-package-version-cleanup)
+* [`sf toolbox package dependencies install`](#sf-toolbox-package-dependencies-install)
+* [`sf toolbox package version cleanup`](#sf-toolbox-package-version-cleanup)
 
 ## `sf toolbox package dependencies install`
 
@@ -140,7 +139,7 @@ FLAG DESCRIPTIONS
     from by entering the branch build name. If not specified, the builds from NULL branch will be considered.
 ```
 
-_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/1.0.0-alpha2/src/commands/toolbox/package/dependencies/install.ts)_
+_See code: [src/commands/toolbox/package/dependencies/install.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/1.0.0-alpha3/src/commands/toolbox/package/dependencies/install.ts)_
 
 ## `sf toolbox package version cleanup`
 
@@ -181,6 +180,5 @@ FLAG DESCRIPTIONS
     The MAJOR.MINOR.PATCH matcher that should be used to find package versions to delete.
 ```
 
-_See code: [src/commands/toolbox/package/version/cleanup.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/1.0.0-alpha2/src/commands/toolbox/package/version/cleanup.ts)_
-
+_See code: [src/commands/toolbox/package/version/cleanup.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/1.0.0-alpha3/src/commands/toolbox/package/version/cleanup.ts)_
 <!-- commandsstop -->
