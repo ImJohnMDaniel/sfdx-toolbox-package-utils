@@ -1,8 +1,14 @@
 /* eslint-disable complexity */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-unsafe-finally */
-import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
-import { AuthInfo, Connection, Messages, Lifecycle, SfError } from '@salesforce/core';
+import {
+  SfCommand,
+  Flags,
+  requiredOrgFlagWithDeprecations,
+  orgApiVersionFlagWithDeprecations,
+  optionalHubFlagWithDeprecations,
+} from '@salesforce/sf-plugins-core';
+import { Messages, Lifecycle, SfError } from '@salesforce/core';
 import { isPackagingDirectory } from '@salesforce/core/project';
 import { Duration } from '@salesforce/kit';
 import {
@@ -57,7 +63,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       description: messages.getMessage('flags.apex-compile.description'),
       char: 'a',
     }),
-    'api-version': Flags.orgApiVersion(),
+    // 'api-version': Flags.orgApiVersion(),
+    'api-version': orgApiVersionFlagWithDeprecations,
     branch: Flags.string({
       summary: messages.getMessage('flags.branch.summary'),
       description: messages.getMessage('flags.branch.description'),
@@ -78,10 +85,10 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       char: 'k',
       multiple: true,
     }),
-    'no-prompt': Flags.boolean({
-      summary: messages.getMessage('flags.no-prompt.summary'),
-      description: messages.getMessage('flags.no-prompt.description'),
-      char: 'r',
+    prompt: Flags.boolean({
+      summary: messages.getMessage('flags.prompt.summary'),
+      description: messages.getMessage('flags.prompt.description'),
+      char: 'p',
       default: false,
       required: false,
     }),
@@ -106,13 +113,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       description: messages.getMessage('flags.skip-handlers.description'),
       hidden: true,
     }),
-    'target-dev-hub': Flags.string({
-      summary: messages.getMessage('flags.target-dev-hub.summary'),
-      char: 'v',
-    }),
-    'target-org': Flags.requiredOrg({
-      summary: messages.getMessage('flags.target-dev-hub.summary'),
-    }),
+    'target-dev-hub': optionalHubFlagWithDeprecations,
+    'target-org': requiredOrgFlagWithDeprecations,
     'upgrade-type': Flags.custom<'DeprecateOnly' | 'Mixed' | 'Delete'>({
       options: ['DeprecateOnly', 'Mixed', 'Delete'],
     })({
@@ -132,7 +134,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
   public async run(): Promise<PackageToInstall[]> {
     const { flags } = await this.parse(PackageDependenciesInstall);
 
-    // Authorize to the target org
+    // Create connection to the target org
+    await flags['target-org'].refreshAuth();
     const targetOrgConnection = flags['target-org']?.getConnection(flags['api-version']);
 
     if (!targetOrgConnection) {
@@ -186,11 +189,9 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         throw messages.createError('error.targetDevHubMissing');
       }
 
-      // Initialize the authorization for the provided dev hub
-      const targetDevHubAuthInfo = await AuthInfo.create({ username: flags['target-dev-hub'] });
-
       // Create a connection to the dev hub
-      const targetDevHubConnection = await Connection.create({ authInfo: targetDevHubAuthInfo });
+      await flags['target-dev-hub'].refreshAuth();
+      const targetDevHubConnection = flags['target-dev-hub']?.getConnection(flags['api-version']);
 
       if (!targetDevHubConnection) {
         throw messages.createError('error.targetDevHubConnectionFailed');
@@ -357,8 +358,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         this.spinner.stop();
       }
 
-      // If the user has not specified --no-prompt, process prompts
-      if (!flags['no-prompt']) {
+      // If the user has specified --prompt, process prompts
+      if (flags['prompt']) {
         // If the user has specified --upgradetype Delete, then prompt for confirmation for Unlocked Packages
         if (flags['upgrade-type'] === 'Delete' && (await subscriberPackageVersion.getPackageType()) === 'Unlocked') {
           const promptMsg = messages.getMessage('prompt.upgradeType');

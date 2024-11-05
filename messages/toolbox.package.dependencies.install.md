@@ -50,13 +50,13 @@ Installation key for key-protected packages
 
 Installation key for key-protected packages in the key:value format of SubscriberPackageVersionId:Key. Specify multiple "--installation-key" flags for more than one key
 
-# flags.no-prompt.summary
+# flags.prompt.summary
 
-Don't prompt for confirmation.
+Prompt for confirmation.
 
-# flags.no-prompt.description
+# flags.prompt.description
 
-Allows the following without an explicit confirmation response: 1) Remote Site Settings and Content Security Policy websites to send or receive data, and 2) --upgrade-type Delete to proceed.
+Require explicit confirmation response: 1) Remote Site Settings and Content Security Policy websites to send or receive data, and 2) --upgrade-type Delete to proceed.
 
 # flags.publish-wait.summary
 

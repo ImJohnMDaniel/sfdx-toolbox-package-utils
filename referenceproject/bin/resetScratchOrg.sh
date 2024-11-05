@@ -13,6 +13,6 @@ else
     devhub_string=""
 fi
 
-sf org delete scratch --no-prompt --target-org toolboxpu1
+sf org delete scratch --prompt --target-org toolboxpu1
 sf org create scratch --alias toolboxpu1 --definition-file config/project-scratch-def.json --set-default --wait 20 --duration-days 1 $devhub_string
 # ../bin/run.js toolbox package dependencies install $devhub_string
