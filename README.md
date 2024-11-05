@@ -46,47 +46,4 @@ sfdx plugins:link .
 
 <!-- commands -->
 
-- [`sf toolbox package version cleanup`](#sf-toolbox-package-version-cleanup)
-
-## `sf toolbox package version cleanup`
-
-Cleanup package versions.
-
-```
-USAGE
-  $ sf toolbox package version cleanup -s <value> -p <value> -v <value> [--json] [--flags-dir <value>] [--api-version
-  <value>]
-
-FLAGS
-  -p, --package=<value>         (required) Package Id
-  -s, --matcher=<value>         (required) MAJOR.MINOR.PATCH
-  -v, --target-dev-hub=<value>  (required) Username or alias of the Dev Hub org. Not required if the `target-dev-hub`
-                                configuration variable is already set.
-      --api-version=<value>     Override the api version used for api requests made by this command
-
-GLOBAL FLAGS
-  --flags-dir=<value>  Import flag values from a directory.
-  --json               Format output as json.
-
-DESCRIPTION
-  Cleanup package versions.
-
-  Delete package versions for a given package provided a MAJOR.MINOR.PATCH matcher. Does not delete released pacakge
-  versions.
-
-EXAMPLES
-  $ sf toolbox package version cleanup --package 0Hoxx00000000CqCAI --matcher 2.10.0 --target-dev-hub myDevHub
-
-FLAG DESCRIPTIONS
-  -p, --package=<value>  Package Id
-
-    The 0Ht Package Id that you wish to cleanup versions for.
-
-  -s, --matcher=<value>  MAJOR.MINOR.PATCH
-
-    The MAJOR.MINOR.PATCH matcher that should be used to find package versions to delete.
-```
-
-_See code: [src/commands/toolbox/package/version/cleanup.ts](https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/blob/1.0.0-alpha5/src/commands/toolbox/package/version/cleanup.ts)_
-
 <!-- commandsstop -->
