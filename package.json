@@ -1,7 +1,7 @@
 {
   "name": "@dx-cli-toolbox/sfdx-toolbox-package-utils",
   "description": "Utilities to better manage SalesforceDX Packages",
-  "version": "1.0.0-alpha5",
+  "version": "1.0.0-alpha6",
   "author": "John M. Daniel @ImJohnMDaniel",
   "bugs": "https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/issues",
   "dependencies": {
