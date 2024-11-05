@@ -85,10 +85,10 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       char: 'k',
       multiple: true,
     }),
-    'no-prompt': Flags.boolean({
-      summary: messages.getMessage('flags.no-prompt.summary'),
-      description: messages.getMessage('flags.no-prompt.description'),
-      char: 'r',
+    prompt: Flags.boolean({
+      summary: messages.getMessage('flags.prompt.summary'),
+      description: messages.getMessage('flags.prompt.description'),
+      char: 'p',
       default: false,
       required: false,
     }),
@@ -113,15 +113,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       description: messages.getMessage('flags.skip-handlers.description'),
       hidden: true,
     }),
-    // 'target-dev-hub': Flags.string({
-    //   summary: messages.getMessage('flags.target-dev-hub.summary'),
-    //   char: 'v',
-    // }),
     'target-dev-hub': optionalHubFlagWithDeprecations,
-    // 'target-org': Flags.requiredOrg({
-    //   summary: messages.getMessage('flags.target-dev-hub.summary'),
-    //   charAliases: ['b'],
-    // }),
     'target-org': requiredOrgFlagWithDeprecations,
     'upgrade-type': Flags.custom<'DeprecateOnly' | 'Mixed' | 'Delete'>({
       options: ['DeprecateOnly', 'Mixed', 'Delete'],
@@ -366,8 +358,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         this.spinner.stop();
       }
 
-      // If the user has not specified --no-prompt, process prompts
-      if (!flags['no-prompt']) {
+      // If the user has specified --prompt, process prompts
+      if (flags['prompt']) {
         // If the user has specified --upgradetype Delete, then prompt for confirmation for Unlocked Packages
         if (flags['upgrade-type'] === 'Delete' && (await subscriberPackageVersion.getPackageType()) === 'Unlocked') {
           const promptMsg = messages.getMessage('prompt.upgradeType');
