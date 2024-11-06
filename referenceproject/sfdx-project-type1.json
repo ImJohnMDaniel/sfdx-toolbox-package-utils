@@ -13,11 +13,6 @@
           "package": "fflib-apex-common@1.2.0-1"
         }
       ]
-    },
-    {
-      "path": "sfdx-source/untracked2",
-      "default": false,
-      "dependencies": []
     }
   ],
   "namespace": "",

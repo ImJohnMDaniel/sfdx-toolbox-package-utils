@@ -1,0 +1,20 @@
+{
+  "packageDirectories": [
+    {
+      "path": "sfdx-source/untracked",
+      "default": true,
+      "dependencies": [
+        {
+          "package": "JeffPackager"
+        }
+      ]
+    }
+  ],
+  "name": "PackageInstall",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "61.0",
+  "packageAliases": {
+    "JeffPackager": "04t8a000000mdH6"
+  }
+}
