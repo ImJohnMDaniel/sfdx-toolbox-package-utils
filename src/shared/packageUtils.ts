@@ -1,4 +1,9 @@
 import { InstalledPackages, PackagingSObjects } from '@salesforce/packaging';
+import {
+  PackageDir,
+  // PackageDirDependency
+} from '@salesforce/schemas';
+import { BasePackageDirWithDependencies } from '../schemas/packageDirs.js';
 
 type PackageInstallRequest = PackagingSObjects.PackageInstallRequest;
 
@@ -39,3 +44,27 @@ export const reducePackageInstallRequestErrors = (request: PackageInstallRequest
 
   return errorMessage;
 };
+
+// export const isPackagingDirectory: (packageDir: PackageDir) => packageDir is PackagePackageDir => isPackagingDir(packageDir);
+// export const isPackagingDirectory = (packageDir: PackageDir): packageDir is PackagePackageDir => isPackagingDir(packageDir);
+
+// export declare const isDependenciesPackagingDirectory: (packageDir: PackageDir) => packageDir is BasePackageDirWithDependencies;
+// export const isDependenciesPackagingDirectory = (packageDir: PackageDir): boolean => return packageDir instanceof BasePackageDirWithDependencies;
+// export const isDependenciesPackagingDirectory = (packageDir: PackageDir): boolean => packageDir instanceof BasePackageDirWithDependencies;
+// export const isDependenciesPackagingDirectory = (packageDir: PackageDir): boolean => packageDir typeof BasePackageDirWithDependencies;
+// export declare const isDependenciesPackagingDirectory: (packageDir: PackageDir) => packageDir is BasePackageDirWithDependencies;
+
+export const isDependenciesPackagingDirectory = (
+  packageDir: PackageDir
+): packageDir is BasePackageDirWithDependencies => isDependenciesPackagingDir(packageDir);
+
+const isDependenciesPackagingDir = (packageDir: PackageDir): boolean =>
+  // 'dependencies' in packageDir && typeof packageDir.dependencies === PackageDirDependency[];
+  'dependencies' in packageDir &&
+  // && typeof packageDir.dependencies === PackageDirDependency;
+  // && typeof packageDir?.dependencies === PackageDirDependency[]
+  Array.isArray(packageDir?.dependencies);
+
+// export {};
+
+// export const isDependenciesPackagingDirectory = (packageDir: PackageDir): boolean => (packageDir is BasePackageDirWithDependencies);
