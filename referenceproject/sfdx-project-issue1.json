@@ -5,7 +5,7 @@
       "default": true,
       "dependencies": [
         {
-          "package": "JeffPackager"
+          "package": "FirstGenPackage"
         }
       ]
     }
@@ -15,6 +15,6 @@
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "61.0",
   "packageAliases": {
-    "JeffPackager": "04t8a000000mdH6"
+    "FirstGenPackage": "04t8a000000mdH6"
   }
 }
