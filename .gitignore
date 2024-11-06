@@ -60,6 +60,7 @@ temp/
 .history/
 
 # Reference Projects
+/referenceproject/sfdx-project.json
 /referenceproject/sfdx-source/untracked
 !/referenceproject/sfdx-source/untracked/README.md
 /referenceproject/temp
