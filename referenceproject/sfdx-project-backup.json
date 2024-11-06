@@ -10,7 +10,7 @@
       ]
     },
     {
-      "path": "sfdx-source/unpackaged",
+      "path": "sfdx-source/untracked2",
       "default": false
     }
   ],

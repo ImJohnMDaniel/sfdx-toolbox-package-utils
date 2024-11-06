@@ -9,7 +9,7 @@ import {
   optionalHubFlagWithDeprecations,
 } from '@salesforce/sf-plugins-core';
 import { Messages, Lifecycle, SfError } from '@salesforce/core';
-import { isPackagingDirectory } from '@salesforce/core/project';
+// import { isPackagingDirectory } from '@salesforce/core/project';
 import { Duration } from '@salesforce/kit';
 import {
   InstalledPackages,
@@ -26,6 +26,7 @@ import {
   isSubscriberPackageVersionId,
   isSubscriberPackageVersionInstalled,
   reducePackageInstallRequestErrors,
+  isDependenciesPackagingDirectory,
 } from '../../../../shared/packageUtils.js';
 
 type PackageInstallRequest = PackagingSObjects.PackageInstallRequest;
@@ -154,13 +155,30 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
 
     this.spinner.start('Analyzing project to determine packages to install', '\n', { stdout: true });
 
+    // const packageDirectorie2s = this.project
+    //   ?.getPackageDirectories()
+    //   .filter((packageDirectory) => isPackagingDirectory(packageDirectory));
+
+    // getPackageDirectories() returns NamedPackageDir[]
+    //    NamedPackageDir is a PackageDir & NameAndFullPath
+    //      PackageDir is BasePackageDir | PackagePackageDir;
+    //        PackagePackageDir is BasePackageDir & {
+    //                                  dependencies?: PackageDirDependency[];
+    //                                  package: string;
+    //                                  versionNumber: string;
+    // The isPackagingDirectory takes a PackageDir for input and returns a PackagePackageDir
+    // isNamedPackagingDirectory
+    // PackagePackageDir
+    // const packageDirectories = this.project?.getPackageDirectories(); // as NamedPackageDir[];
+    // packageDirectories?.filter( (packageDirectory) => isPackagingDirectory(packageDirectory) );
+    //
     const packageDirectories = this.project
       ?.getPackageDirectories()
-      .filter((packageDirectory) => isPackagingDirectory(packageDirectory));
+      .filter((packageDirectory) => isDependenciesPackagingDirectory(packageDirectory));
 
     for (const packageDirectory of packageDirectories ?? []) {
       for (const dependency of packageDirectory?.dependencies ?? []) {
-        if (dependency.package && dependency.versionNumber) {
+        if (dependency?.package && dependency?.versionNumber) {
           // This must be resolved by a dev hub
           devHubDependencies.push(dependency);
           continue;
