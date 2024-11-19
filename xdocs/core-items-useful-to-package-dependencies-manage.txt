@@ -1,0 +1,45 @@
+Core functions, interfaces, and methods that may be useful to the "toolbox package dependency manage" command.
+
+
+plugin-packaging
+    command "package version list"
+        - the command makes use of "await Package.listVersions()"
+        - the command queries for the packages and then lookups the details on each package version 
+        - 
+    command "package version create"
+
+packaging 
+    src/interfaces/packagingInterfacesAndType.ts 
+        - PackageVersionListOptions
+        - PackageVersionListResult
+    src/package/package.ts 
+        - Package.list -- Returns all the packages that are available in the org.
+            - this is the static method 
+            - returns PackagingSObjects.Package2[]
+        - Package.listVersions
+            - this is the static method 
+            - returns PackageVersionListResult[]
+        - Package.getPackageVersions(options?: PackageVersionListOptions) -- Returns the list of package versions for the package.
+            - this is the instance method 
+
+
+ * The sfdx-project.json config object. This file determines if a folder is a valid sfdx project.
+ *
+ * *Note:* Any non-standard (not owned by Salesforce) properties stored in sfdx-project.json should
+ * be in a top level property that represents your project.
+ * Plugins should store their configuration @see SfProject.getPluginConfiguration and @see SfProject.setPluginConfiguration
+ *
+ * @example reading a standard property
+ * ```
+ * const project = await SfProject.resolve();
+ * const projectJson = await project.resolveProjectConfig();
+ * const namespace = projectJson.get('namespace');
+ * ```
+ *
+ * ```
+ * @example writing
+ * const project = await SfProject.resolve();
+ * const projectJson = await project.resolveProjectConfig();
+ * projectJson.set('namespace', 'new');
+ * await projectJson.write();
+ * ```

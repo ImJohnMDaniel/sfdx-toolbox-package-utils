@@ -37,7 +37,7 @@ const messages = Messages.loadMessages(
   'toolbox.package.dependencies.install'
 );
 
-export type PackageToInstall = {
+export type ToolboxPackageToInstall = {
   Status: string;
   PackageName: string;
   SubscriberPackageVersionId: string;
@@ -49,7 +49,7 @@ const upgradeType = { Delete: 'delete-only', DeprecateOnly: 'deprecate-only', Mi
 
 const installationKeyRegex = new RegExp(/^(\w+:\w+)(,\s*\w+:\w+)*/);
 
-export default class PackageDependenciesInstall extends SfCommand<PackageToInstall[]> {
+export default class ToolboxPackageDependenciesInstall extends SfCommand<ToolboxPackageToInstall[]> {
   public static readonly summary = messages.getMessage('summary');
   public static readonly description = messages.getMessage('description');
   public static readonly examples = messages.getMessages('examples');
@@ -64,7 +64,6 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       description: messages.getMessage('flags.apex-compile.description'),
       char: 'a',
     }),
-    // 'api-version': Flags.orgApiVersion(),
     'api-version': orgApiVersionFlagWithDeprecations,
     branch: Flags.string({
       summary: messages.getMessage('flags.branch.summary'),
@@ -132,8 +131,8 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
     }),
   };
 
-  public async run(): Promise<PackageToInstall[]> {
-    const { flags } = await this.parse(PackageDependenciesInstall);
+  public async run(): Promise<ToolboxPackageToInstall[]> {
+    const { flags } = await this.parse(ToolboxPackageDependenciesInstall);
 
     // Create connection to the target org
     await flags['target-org'].refreshAuth();
@@ -149,7 +148,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       throw messages.createError('error.apiVersionTooLow');
     }
 
-    let packagesToInstall: PackageToInstall[] = [];
+    let packagesToInstall: ToolboxPackageToInstall[] = [];
     const packageInstallRequests: PackageInstallRequest[] = [];
     const devHubDependencies: PackageDirDependency[] = [];
 
@@ -194,7 +193,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
           Status: '',
           PackageName: dependency.package,
           SubscriberPackageVersionId: packageVersionId,
-        } as PackageToInstall);
+        } as ToolboxPackageToInstall);
       }
     }
 
@@ -240,7 +239,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
           PackageName: devHubDependency.package,
           Status: '',
           SubscriberPackageVersionId: packageVersionId,
-        } as PackageToInstall);
+        } as ToolboxPackageToInstall);
       }
 
       this.spinner.stop();
