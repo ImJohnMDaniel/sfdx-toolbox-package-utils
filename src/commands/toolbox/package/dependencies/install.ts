@@ -152,7 +152,7 @@ export default class ToolboxPackageDependenciesInstall extends SfCommand<Toolbox
     const packageInstallRequests: PackageInstallRequest[] = [];
     const devHubDependencies: PackageDirDependency[] = [];
 
-    this.spinner.start('Analyzing project to determine packages to install', '\n', { stdout: true });
+    this.spinner.start('Analyzing project to determine packages to install', '', { stdout: true });
 
     // const packageDirectorie2s = this.project
     //   ?.getPackageDirectories()
@@ -200,7 +200,7 @@ export default class ToolboxPackageDependenciesInstall extends SfCommand<Toolbox
     this.spinner.stop();
 
     if (devHubDependencies.length > 0) {
-      this.spinner.start('Resolving package versions from dev hub', '\n', { stdout: true });
+      this.spinner.start('Resolving package versions from dev hub', '', { stdout: true });
 
       if (!flags['target-dev-hub']) {
         throw messages.createError('error.targetDevHubMissing');
@@ -246,7 +246,7 @@ export default class ToolboxPackageDependenciesInstall extends SfCommand<Toolbox
     }
 
     // Filter out duplicate packages before we start the install process
-    this.spinner.start('Checking for duplicate package dependencies', '\n', { stdout: true });
+    this.spinner.start('Checking for duplicate package dependencies', '', { stdout: true });
     packagesToInstall = packagesToInstall.filter(
       (packageToInstall, index, self) =>
         index === self.findIndex((t) => t.SubscriberPackageVersionId === packageToInstall?.SubscriberPackageVersionId)
@@ -262,7 +262,7 @@ export default class ToolboxPackageDependenciesInstall extends SfCommand<Toolbox
     const installationKeyMap = new Map<string, string>();
 
     if (flags['installation-key']) {
-      this.spinner.start('Processing package installation keys', '\n', { stdout: true });
+      this.spinner.start('Processing package installation keys', '', { stdout: true });
       for (let installationKey of flags['installation-key']) {
         installationKey = installationKey.trim();
 
@@ -289,12 +289,12 @@ export default class ToolboxPackageDependenciesInstall extends SfCommand<Toolbox
 
     // If precheck is enabled, get the currently installed packages
     if (installType[flags['install-type']] === installType.Delta) {
-      this.spinner.start('Analyzing which packages to install', '\n', { stdout: true });
+      this.spinner.start('Analyzing which packages to install', '', { stdout: true });
       installedPackages = await SubscriberPackageVersion.installedList(targetOrgConnection);
       this.spinner.stop();
     }
 
-    this.spinner.start('Installing dependent packages', '\n', { stdout: true });
+    this.spinner.start('Installing dependent packages', '', { stdout: true });
 
     for (const packageToInstall of packagesToInstall) {
       if (installType[flags['install-type']] === installType.Delta) {
@@ -316,7 +316,7 @@ export default class ToolboxPackageDependenciesInstall extends SfCommand<Toolbox
         installationKey = installationKeyMap.get(packageToInstall?.SubscriberPackageVersionId) ?? '';
       }
 
-      this.spinner.start(`Preparing package ${packageToInstall.PackageName}`, '\n', { stdout: true });
+      this.spinner.start(`Preparing package ${packageToInstall.PackageName}`, '', { stdout: true });
 
       const subscriberPackageVersion = new SubscriberPackageVersion({
         aliasOrId: packageToInstall?.SubscriberPackageVersionId,
@@ -417,7 +417,7 @@ export default class ToolboxPackageDependenciesInstall extends SfCommand<Toolbox
 
       let pkgInstallRequest: Optional<PackageInstallRequest>;
       try {
-        this.spinner.start(`Installing package ${packageToInstall.PackageName}`, '\n', { stdout: true });
+        this.spinner.start(`Installing package ${packageToInstall.PackageName}`, '', { stdout: true });
         pkgInstallRequest = await subscriberPackageVersion.install(request, installOptions);
         this.spinner.stop();
       } catch (error: unknown) {
