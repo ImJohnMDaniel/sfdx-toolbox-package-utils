@@ -5,24 +5,25 @@
   "author": "John M. Daniel @ImJohnMDaniel",
   "bugs": "https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/issues",
   "dependencies": {
-    "@oclif/core": "^4.0.31",
-    "@salesforce/core": "^8.6.4",
+    "@oclif/core": "^4.0.33",
+    "@salesforce/core": "^8.8.0",
     "@salesforce/kit": "^3.2.3",
     "@salesforce/packaging": "^4.2.15",
     "@salesforce/schemas": "^1.9.0",
-    "@salesforce/sf-plugins-core": "^12.0.11",
+    "@salesforce/sf-plugins-core": "^12.1.0",
     "@salesforce/ts-types": "^2.0.12",
     "@types/sinon": "^17.0.3"
   },
   "devDependencies": {
-    "@oclif/plugin-command-snapshot": "^5.2.20",
-    "@salesforce/cli-plugins-testkit": "^5.3.35",
-    "@salesforce/dev-scripts": "^10.2.10",
+    "@oclif/plugin-command-snapshot": "^5.2.22",
+    "@salesforce/cli-plugins-testkit": "^5.3.38",
+    "@salesforce/dev-scripts": "^10.2.11",
     "@types/graceful-fs": "^4.1.9",
-    "eslint-plugin-sf-plugin": "^1.20.10",
-    "oclif": "^4.15.16",
+    "@types/lodash": "^4.17.13",
+    "eslint-plugin-sf-plugin": "^1.20.13",
+    "oclif": "^4.15.29",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   },
   "engines": {
     "node": ">=18.0.0"
