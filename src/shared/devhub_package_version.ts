@@ -1,5 +1,6 @@
 import { JsonMap } from '@salesforce/ts-types';
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface DevHubPackageVersion extends JsonMap {
   Alias: string;
   Branch: string;
@@ -25,8 +26,10 @@ export interface DevHubPackageVersion extends JsonMap {
   Version: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface DevHubPackageVersionMap extends Map<string, DevHubPackageVersion> {}
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface DevHubPackageVersions {
   versions: DevHubPackageVersion[];
 }

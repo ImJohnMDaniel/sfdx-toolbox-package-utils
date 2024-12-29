@@ -11,7 +11,7 @@ import {
   // AuthInfo,
   // Connection,
   Messages,
-  SfProject,
+  // SfProject,
   // Lifecycle,
   // SfError,
   // SfProject
@@ -27,6 +27,7 @@ import {
 // import { PackageDirDependency } from '@salesforce/schemas';
 import { basePackageDependencyRelatedFlags } from '../../../../shared/flags.js';
 import { ProjectDependencyChange } from '../../../../shared/project_dependency_change.js';
+import { SfdxProjectUtils } from '../../../../shared/sfdx_project_utils.js';
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
 const messages = Messages.loadMessages(
@@ -85,29 +86,39 @@ export default class ToolboxPackageDependenciesManage extends SfCommand<ToolboxP
       ProjectDependencyChange[]
     >();
 
-    const project = await SfProject.resolve();
+    // const project = await SfProject.resolve();
     // const projectJson = await project.resolveProjectConfig();
     // const namespace = projectJson.get('namespace');
 
+    // get the package branch names that are to be considered as "released versions"
+    const branchNamesThatContainReleasedVersions = await (
+      await SfdxProjectUtils.getInstance()
+    ).getBranchNamesThatContainReleasedVersions();
+
     // get the project dependencies to ignore from the sfdx-project.json
+
     // using the sfdxProjectJson, retrieve the 'contents' section 'plugins.toolbox.dependencies.ignore'
-    let pluginConfig;
-    try {
-      pluginConfig = await project.getPluginConfiguration('toolbox');
-    } catch (err) {
-      // if (err instanceof Error && err.name === 'InvalidProjectWorkspaceError') {
-      // e slint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const error = err as Error;
-      // }
-      // eslint-disable-next-line no-console
-      console.error('\n\nerror________');
-      // eslint-disable-next-line no-console
-      console.error(error.name);
-      // eslint-disable-next-line no-console
-      console.error(error.message);
-      // eslint-disable-next-line no-console
-      console.error('error_____end\n\n');
-    }
+    // let pluginConfig;
+    // try {
+    //   pluginConfig = await project.getPluginConfiguration('toolbox');
+    // } catch (err) {
+    // if (err instanceof Error && err.name === 'InvalidProjectWorkspaceError') {
+    // e slint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    // const error = err as Error;
+    // }
+    //   // eslint-disable-next-line no-console
+    //   console.error('\n\nerror________');
+    //   // eslint-disable-next-line no-console
+    //   console.error(error.name);
+    //   // eslint-disable-next-line no-console
+    //   console.error(error.message);
+    //   // eslint-disable-next-line no-console
+    // console.error('error_____end\n\n');
+    // }
+
+    // const project = await SfProject.resolve();
+    // const pluginConfig = await project.getPluginConfiguration('toolbox') as ToolboxPackageUtilsPluginConfig;
+    // pluginConfig.package.brancheswithreleasedversions;
 
     // ******************************************************************************************
     // WORKING DEBUG OUTPUT
@@ -116,7 +127,7 @@ export default class ToolboxPackageDependenciesManage extends SfCommand<ToolboxP
     // eslint-disable-next-line no-console
     console.log(packageDependencyChangeMap);
     // eslint-disable-next-line no-console
-    console.log(pluginConfig);
+    console.log(branchNamesThatContainReleasedVersions);
     // ******************************************************************************************
 
     // const dependenciesToIgnore = projectJson.
