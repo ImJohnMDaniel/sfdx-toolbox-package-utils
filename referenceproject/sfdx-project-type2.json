@@ -23,7 +23,7 @@
       "package": {
         "brancheswithreleasedversions": ["bluefish", "bluefield"],
         "dependencies": {
-          "ignore": "bluefish"
+          "ignore": ["bluefish"]
         }
       }
     }

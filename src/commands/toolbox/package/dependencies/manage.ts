@@ -90,35 +90,14 @@ export default class ToolboxPackageDependenciesManage extends SfCommand<ToolboxP
     // const projectJson = await project.resolveProjectConfig();
     // const namespace = projectJson.get('namespace');
 
+    const projUtils = await SfdxProjectUtils.getInstance();
+
     // get the package branch names that are to be considered as "released versions"
-    const branchNamesThatContainReleasedVersions = await (
-      await SfdxProjectUtils.getInstance()
-    ).getBranchNamesThatContainReleasedVersions();
+    // TODO: Q: Why does this even matter?  If "released versions" is simply where package version is promoted, what the branch attribute is on the DevHub package version listing should not be relevant.
+    const branchNamesThatContainReleasedVersions = await projUtils.getBranchNamesThatContainReleasedVersions();
 
     // get the project dependencies to ignore from the sfdx-project.json
-
-    // using the sfdxProjectJson, retrieve the 'contents' section 'plugins.toolbox.dependencies.ignore'
-    // let pluginConfig;
-    // try {
-    //   pluginConfig = await project.getPluginConfiguration('toolbox');
-    // } catch (err) {
-    // if (err instanceof Error && err.name === 'InvalidProjectWorkspaceError') {
-    // e slint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    // const error = err as Error;
-    // }
-    //   // eslint-disable-next-line no-console
-    //   console.error('\n\nerror________');
-    //   // eslint-disable-next-line no-console
-    //   console.error(error.name);
-    //   // eslint-disable-next-line no-console
-    //   console.error(error.message);
-    //   // eslint-disable-next-line no-console
-    // console.error('error_____end\n\n');
-    // }
-
-    // const project = await SfProject.resolve();
-    // const pluginConfig = await project.getPluginConfiguration('toolbox') as ToolboxPackageUtilsPluginConfig;
-    // pluginConfig.package.brancheswithreleasedversions;
+    const dependenciesToIgnore = await projUtils.getProjectDependenciesToIgnore();
 
     // ******************************************************************************************
     // WORKING DEBUG OUTPUT
@@ -128,12 +107,9 @@ export default class ToolboxPackageDependenciesManage extends SfCommand<ToolboxP
     console.log(packageDependencyChangeMap);
     // eslint-disable-next-line no-console
     console.log(branchNamesThatContainReleasedVersions);
+    // eslint-disable-next-line no-console
+    console.log(dependenciesToIgnore);
     // ******************************************************************************************
-
-    // const dependenciesToIgnore = projectJson.
-
-    // get the branch names that contain released versions
-    // Q: Why does this even matter?  If "released versions" is simply where package version is promoted, what the branch attribute is on the DevHub package version listing should not be relevant.
 
     // setup the inline method "evaluateOptions()"
 

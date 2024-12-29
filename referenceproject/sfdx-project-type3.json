@@ -22,7 +22,7 @@
     "toolbox": {
       "package": {
         "dependencies": {
-          "ignore": "bluefish"
+          "ignore": ["bluefish"]
         }
       }
     }

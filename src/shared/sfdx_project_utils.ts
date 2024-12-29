@@ -16,6 +16,9 @@ import { SfProject } from '@salesforce/core';
 export type ToolboxPackageUtilsPluginConfig = {
   package: {
     brancheswithreleasedversions: string[];
+    dependencies: {
+      ignore: string[];
+    };
   };
 };
 
@@ -30,25 +33,36 @@ export class SfdxProjectUtils {
     return new SfdxProjectUtils(await SfProject.resolve());
   }
 
-  // public static async getBranchNamesThatContainReleasedVersions(): Promise<string[]> {
   public async getBranchNamesThatContainReleasedVersions(): Promise<string[]> {
-    let branchNames: string[] = [];
+    const toolboxPluginConfig = await this.getToolboxPluginConfig();
+    // eslint-disable-next-line no-console
+    // console.log(toolboxPluginConfig);
+
+    const theresult = toolboxPluginConfig ? toolboxPluginConfig.package?.brancheswithreleasedversions : [];
+
+    return theresult || [];
+  }
+
+  public async getProjectDependenciesToIgnore(): Promise<string[]> {
+    const toolboxPluginConfig = await this.getToolboxPluginConfig();
+    // eslint-disable-next-line no-console
+    // console.log(toolboxPluginConfig);
+
+    const theresult = toolboxPluginConfig ? toolboxPluginConfig.package?.dependencies?.ignore : [];
+
+    return theresult || [];
+  }
+
+  private async getToolboxPluginConfig(): Promise<ToolboxPackageUtilsPluginConfig | undefined> {
+    let toolboxPluginConfig: ToolboxPackageUtilsPluginConfig;
 
     try {
-      // const pluginConfig = await project.getPluginConfiguration('toolbox') as ToolboxPackageUtilsPluginConfig;
       const pluginConfigAsUnknown = (await this.sfProject.getPluginConfiguration('toolbox')) as unknown;
 
       // Promise<Readonly<Record<string, unknown>>>
-      const pluginConfig = pluginConfigAsUnknown as ToolboxPackageUtilsPluginConfig;
+      toolboxPluginConfig = pluginConfigAsUnknown as ToolboxPackageUtilsPluginConfig;
 
-      // // eslint-disable-next-line no-console
-      // console.log('pluginConfig......');
-      // // eslint-disable-next-line no-console
-      // console.log(pluginConfig);
-      // // eslint-disable-next-line no-console
-      // console.log('..................');
-
-      branchNames = pluginConfig.package.brancheswithreleasedversions || [];
+      return toolboxPluginConfig;
     } catch (err) {
       if (err instanceof Error) {
         const error = err;
@@ -60,34 +74,7 @@ export class SfdxProjectUtils {
         }
       }
     }
-    return branchNames;
+
+    return undefined;
   }
 }
-
-//         const project = await SfProject.resolve();
-//         const pluginConfig = await project.getPluginConfiguration('toolbox') as ToolboxPackageUtilsPluginConfig;
-//         // return _.get(this.sfdxProjectJson['contents'], 'plugins.toolbox.package.brancheswithreleasedversions', false) as string[];
-//         // return _.get(pluginConfig, 'package.brancheswithreleasedversions', false) as string[];
-
-//         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unused-vars
-//         // const bluefish = _.get(pluginConfig, 'package.brancheswithreleasedversions', []) as string[];
-//         // const bluefish = pluginConfig?.package?.brancheswithreleasedversions;
-
-//         // const pluginConfigAlt = {
-//         //     "package": {
-//         //       "brancheswithreleasedversions": ["bluefish"]
-//         //     }
-//         //   };
-
-//         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-//         // const bluefish = pluginConfigAlt.package.brancheswithreleasedversions;
-
-//         // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-//         // const bluefish = JSON.parse(pluginConfig)?.package.brancheswithreleasedversions;
-
-//         // eslint-disable-next-line @typescript-eslint/no-unused-vars, , @typescript-eslint/no-unsafe-assignment
-//         // const firstElement = pluginConfig.package.brancheswithreleasedversions;
-
-//         return pluginConfig.package.brancheswithreleasedversions;
-//     }
-// }
