@@ -21,7 +21,6 @@
   "plugins": {
     "toolbox": {
       "package": {
-        "brancheswithreleasedversions": ["bluefish", "bluefield"],
         "dependencies": {
           "ignore": "bluefish"
         }
