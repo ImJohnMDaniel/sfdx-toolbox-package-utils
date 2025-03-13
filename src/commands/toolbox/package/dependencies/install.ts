@@ -10,6 +10,7 @@ import {
 } from '@salesforce/sf-plugins-core';
 import { Messages, Lifecycle, SfError } from '@salesforce/core';
 // import { isPackagingDirectory } from '@salesforce/core/project';
+import ora from 'ora';
 import { Duration } from '@salesforce/kit';
 import {
   InstalledPackages,
@@ -153,7 +154,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
     const packageInstallRequests: PackageInstallRequest[] = [];
     const devHubDependencies: PackageDirDependency[] = [];
 
-    this.spinner.start('Analyzing project to determine packages to install', '', { stdout: true });
+    const oraSpinner = ora('Analyzing project to determine packages to install').start();
 
     // const packageDirectorie2s = this.project
     //   ?.getPackageDirectories()
@@ -198,10 +199,10 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
       }
     }
 
-    this.spinner.stop();
+    oraSpinner.stop();
 
     if (devHubDependencies.length > 0) {
-      this.spinner.start('Resolving package versions from dev hub', '', { stdout: true });
+      oraSpinner.start('Resolving package versions from dev hub');
 
       if (!flags['target-dev-hub']) {
         throw messages.createError('error.targetDevHubMissing');
@@ -243,19 +244,19 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         } as PackageToInstall);
       }
 
-      this.spinner.stop();
+      oraSpinner.stop();
     }
 
     // Filter out duplicate packages before we start the install process
-    this.spinner.start('Checking for duplicate package dependencies', '', { stdout: true });
+    oraSpinner.start('Checking for duplicate package dependencies');
     packagesToInstall = packagesToInstall.filter(
       (packageToInstall, index, self) =>
         index === self.findIndex((t) => t.SubscriberPackageVersionId === packageToInstall?.SubscriberPackageVersionId)
     );
-    this.spinner.stop();
+    oraSpinner.stop();
 
     if (packagesToInstall?.length === 0) {
-      this.log('No packages were found to install');
+      oraSpinner.warn('No packages were found to install');
       return packagesToInstall;
     }
 
@@ -263,7 +264,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
     const installationKeyMap = new Map<string, string>();
 
     if (flags['installation-key']) {
-      this.spinner.start('Processing package installation keys', '', { stdout: true });
+      oraSpinner.start('Processing package installation keys');
       for (let installationKey of flags['installation-key']) {
         installationKey = installationKey.trim();
 
@@ -283,26 +284,26 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
 
         installationKeyMap.set(packageVersionId, packageInstallationKey);
       }
-      this.spinner.stop();
+      oraSpinner.stop();
     }
 
     let installedPackages: InstalledPackages[] = [];
 
     // If precheck is enabled, get the currently installed packages
     if (installType[flags['install-type']] === installType.Delta) {
-      this.spinner.start('Analyzing which packages to install', '', { stdout: true });
+      oraSpinner.start('Analyzing which packages to install');
       installedPackages = await SubscriberPackageVersion.installedList(targetOrgConnection);
-      this.spinner.stop();
+      oraSpinner.stop();
     }
 
-    this.spinner.start('Installing dependent packages', '', { stdout: true });
+    oraSpinner.start('Installing dependent packages');
 
     for (const packageToInstall of packagesToInstall) {
       if (installType[flags['install-type']] === installType.Delta) {
         if (isSubscriberPackageVersionInstalled(installedPackages, packageToInstall?.SubscriberPackageVersionId)) {
           packageToInstall.Status = 'Skipped';
 
-          this.log(
+          oraSpinner.info(
             `Package ${packageToInstall?.PackageName} (${packageToInstall?.SubscriberPackageVersionId}) is already installed and will be skipped`
           );
 
@@ -317,7 +318,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         installationKey = installationKeyMap.get(packageToInstall?.SubscriberPackageVersionId) ?? '';
       }
 
-      this.spinner.start(`Preparing package ${packageToInstall.PackageName}`, '', { stdout: true });
+      oraSpinner.start(`Preparing package ${packageToInstall.PackageName}`);
 
       const subscriberPackageVersion = new SubscriberPackageVersion({
         aliasOrId: packageToInstall?.SubscriberPackageVersionId,
@@ -340,7 +341,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         this.warn(warningMsg);
       });
 
-      this.spinner.stop();
+      oraSpinner.stop();
 
       if (flags['publish-wait']?.milliseconds > 0) {
         let timeThen = Date.now();
@@ -356,15 +357,11 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
             remainingTime = Duration.milliseconds(remainingTime.milliseconds - elapsedTime.milliseconds);
             const status =
               publishStatus === 'NO_ERRORS_DETECTED' ? 'Available for installation' : 'Unavailable for installation';
-            this.spinner.status = `${remainingTime.minutes} minutes remaining until timeout. Publish status: ${status}\n`;
+            oraSpinner.text = `${remainingTime.minutes} minutes remaining until timeout. Publish status: ${status}\n`;
           }
         );
 
-        this.spinner.start(
-          `${remainingTime.minutes} minutes remaining until timeout. Publish status: 'Querying Status'`,
-          '\n',
-          { stdout: true }
-        );
+        oraSpinner.start(`${remainingTime.minutes} minutes remaining until timeout. Publish status: 'Querying Status'`);
 
         await subscriberPackageVersion.waitForPublish({
           publishTimeout: flags['publish-wait'],
@@ -373,7 +370,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
         });
 
         // need to stop the spinner to avoid weird behavior with the prompts below
-        this.spinner.stop();
+        oraSpinner.stop();
       }
 
       // If the user has specified --prompt, process prompts
@@ -411,20 +408,20 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
             const elapsedTime = Duration.milliseconds(Date.now() - timeThen);
             timeThen = Date.now();
             remainingTime = Duration.milliseconds(remainingTime.milliseconds - elapsedTime.milliseconds);
-            this.spinner.status = `${remainingTime.minutes} minutes remaining until timeout. Install status: ${piRequest.Status}\n`;
+            oraSpinner.text = `Installing package ${packageToInstall.PackageName} ${remainingTime.minutes} minutes remaining until timeout. Install status: ${piRequest.Status}\n`;
           }
         );
       }
 
       let pkgInstallRequest: Optional<PackageInstallRequest>;
       try {
-        this.spinner.start(`Installing package ${packageToInstall.PackageName}`, '', { stdout: true });
+        oraSpinner.start(`Installing package ${packageToInstall.PackageName}`);
         pkgInstallRequest = await subscriberPackageVersion.install(request, installOptions);
-        this.spinner.stop();
+        oraSpinner.stop();
       } catch (error: unknown) {
         if (error instanceof SfError && error.data) {
           pkgInstallRequest = error.data as PackageInstallRequest;
-          this.spinner.stop(messages.getMessage('error.packageInstallPollingTimeout'));
+          oraSpinner.fail(messages.getMessage('error.packageInstallPollingTimeout'));
         } else {
           throw error;
         }
@@ -433,6 +430,9 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
           if (pkgInstallRequest.Status === 'SUCCESS') {
             packageToInstall.Status = 'Installed';
             packageInstallRequests.push(pkgInstallRequest);
+            oraSpinner.succeed(
+              `Package ${packageToInstall?.PackageName} (${packageToInstall?.SubscriberPackageVersionId}) is installed successfully.`
+            );
           } else if (['IN_PROGRESS', 'UNKNOWN'].includes(pkgInstallRequest.Status)) {
             packageToInstall.Status = 'Installing';
             throw messages.createError('error.packageInstallInProgress', [

@@ -12,7 +12,9 @@
     "@salesforce/ts-types": "^2.0.12",
     "@salesforce/schemas": "^1.9.0",
     "@salesforce/kit": "^3.2.3",
-    "@types/sinon": "^17.0.3"
+    "@types/sinon": "^17.0.3",
+    "ora": "^8.2.0",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@oclif/plugin-command-snapshot": "^5.2.20",
