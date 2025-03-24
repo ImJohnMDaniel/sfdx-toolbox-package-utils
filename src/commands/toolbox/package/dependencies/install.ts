@@ -356,13 +356,13 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
             remainingTime = Duration.milliseconds(remainingTime.milliseconds - elapsedTime.milliseconds);
             const status =
               publishStatus === 'NO_ERRORS_DETECTED' ? 'Available for installation' : 'Unavailable for installation';
-            this.spinner.status = `${remainingTime.minutes} minutes remaining until timeout. Publish status: ${status}\n`;
+            this.spinner.status = `${remainingTime.minutes} minutes remaining until timeout. Publish status: ${status}`;
           }
         );
 
         this.spinner.start(
           `${remainingTime.minutes} minutes remaining until timeout. Publish status: 'Querying Status'`,
-          '\n',
+          '',
           { stdout: true }
         );
 
@@ -411,7 +411,7 @@ export default class PackageDependenciesInstall extends SfCommand<PackageToInsta
             const elapsedTime = Duration.milliseconds(Date.now() - timeThen);
             timeThen = Date.now();
             remainingTime = Duration.milliseconds(remainingTime.milliseconds - elapsedTime.milliseconds);
-            this.spinner.status = `${remainingTime.minutes} minutes remaining until timeout. Install status: ${piRequest.Status}\n`;
+            this.spinner.status = `${remainingTime.minutes} minutes remaining until timeout. Install status: ${piRequest.Status}`;
           }
         );
       }
