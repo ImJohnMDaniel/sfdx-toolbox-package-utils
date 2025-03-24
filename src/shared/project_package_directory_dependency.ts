@@ -1,4 +1,6 @@
-import { AnyJson, JsonMap } from '@salesforce/ts-types';
+import { JsonMap } from '@salesforce/ts-types';
+import { PackageDirDependency } from '@salesforce/schemas';
+import { VersionNumber } from '@salesforce/packaging';
 import { isSubscriberPackageId, isSubscriberPackageVersionId } from '../shared/packageUtils.js';
 // import { Constants } from '../shared/constants';
 // import { packagePrefixes } from '@salesforce/packaging';
@@ -19,21 +21,50 @@ import { isSubscriberPackageId, isSubscriberPackageVersionId } from '../shared/p
 export class ProjectPackageDirectoryDependency {
   private subscriberPackageVersionId: string; // 04t package version id
   private package2Id: string; // 0Ho package id
-  private versionNumber: string;
-  private majorVersion: number;
-  private minorVersion: number;
-  private patchVersion: number;
-  private buildVersion: number;
+  private versionNumber: VersionNumber;
+  private branch: string | undefined;
+  // private versionNumber: string;
+  // private majorVersion: number;
+  // private minorVersion: number;
+  // private patchVersion: number;
+  // private buildVersion: number;
   private isLATESTSpecified: boolean = false;
 
-  public constructor(projectPackageDirectoryDependency?: AnyJson) {
+  // public constructor(projectPackageDirectoryDependency?: AnyJson) {
+  //   this.subscriberPackageVersionId = '';
+  //   this.package2Id = '';
+  //   this.versionNumber = '';
+  //   this.majorVersion = 0;
+  //   this.minorVersion = 0;
+  //   this.patchVersion = 0;
+  //   this.buildVersion = 0;
+  //   if (projectPackageDirectoryDependency !== undefined) {
+  //     this.processProjectPackageDirectoryDependencyJson(projectPackageDirectoryDependency);
+  //   }
+  // }
+
+  public constructor(projectPackageDirectoryDependency?: PackageDirDependency) {
     this.subscriberPackageVersionId = '';
     this.package2Id = '';
-    this.versionNumber = '';
-    this.majorVersion = 0;
-    this.minorVersion = 0;
-    this.patchVersion = 0;
-    this.buildVersion = 0;
+    // eslint-disable-next-line no-console
+    console.log('projectPackageDirectoryDependency?.package == ' + projectPackageDirectoryDependency?.package);
+    // eslint-disable-next-line no-console
+    console.log(
+      'projectPackageDirectoryDependency?.versionNumber == ' + projectPackageDirectoryDependency?.versionNumber
+    );
+    // eslint-disable-next-line no-console
+    console.log('adjusted.... == ' + projectPackageDirectoryDependency?.versionNumber?.replace('-', '.'));
+    // TODO: Figure out how to deal with a package that is simply a raw 04t.
+    this.versionNumber = VersionNumber.from(
+      projectPackageDirectoryDependency?.versionNumber?.replace('-', '.') ??
+        projectPackageDirectoryDependency?.package.split('@')[1]?.replace('-', '.')
+    );
+    this.branch = projectPackageDirectoryDependency?.branch;
+    // this.versionNumber = '';
+    // this.majorVersion = 0;
+    // this.minorVersion = 0;
+    // this.patchVersion = 0;
+    // this.buildVersion = 0;
     if (projectPackageDirectoryDependency !== undefined) {
       this.processProjectPackageDirectoryDependencyJson(projectPackageDirectoryDependency);
     }
@@ -64,48 +95,52 @@ export class ProjectPackageDirectoryDependency {
   }
 
   public getVersionNumber(): string {
-    return this.versionNumber;
+    return this.versionNumber.toString();
   }
 
   public getMajorVersionNumber(): number {
-    return this.majorVersion;
+    return +this.versionNumber.major;
   }
 
   public getMinorVersionNumber(): number {
-    return this.minorVersion;
+    return +this.versionNumber.minor;
   }
 
   public getPatchVersionNumber(): number {
-    return this.patchVersion;
+    return +this.versionNumber.patch;
   }
 
   public getBuildVersionNumber(): number {
-    return this.buildVersion;
+    return +this.versionNumber.build;
+  }
+
+  public getBranch(): string | undefined {
+    return this.branch;
   }
 
   public setPackageAndVersionNumber(package2Id: string, versionNumber: string): void {
     this.package2Id = package2Id;
-    this.versionNumber = versionNumber;
-    const vers = versionNumber.split('.');
-    if (vers[0]) {
-      this.majorVersion = +vers[0];
-    }
-    if (vers[1]) {
-      this.minorVersion = +vers[1];
-    }
-    if (vers[2]) {
-      this.patchVersion = +vers[2];
-    }
-    if (vers[3]) {
-      this.buildVersion = +vers[3];
-    }
+    this.versionNumber = VersionNumber.from(versionNumber);
+    // const vers = versionNumber.split('.');
+    // if (vers[0]) {
+    //   this.majorVersion = +vers[0];
+    // }
+    // if (vers[1]) {
+    //   this.minorVersion = +vers[1];
+    // }
+    // if (vers[2]) {
+    //   this.patchVersion = +vers[2];
+    // }
+    // if (vers[3]) {
+    //   this.buildVersion = +vers[3];
+    // }
   }
 
   public setSubscriberPackageVersionId(subscriberPackageVersionId: string): void {
     this.subscriberPackageVersionId = subscriberPackageVersionId;
   }
 
-  private processProjectPackageDirectoryDependencyJson(projectPackageDependency: AnyJson): void {
+  private processProjectPackageDirectoryDependencyJson(projectPackageDependency: PackageDirDependency): void {
     // check the arguments
     // if ( !projectPackageDependency || !projectPackageDependency.trim() ) {
 
@@ -130,21 +165,21 @@ export class ProjectPackageDirectoryDependency {
       this.subscriberPackageVersionId = dependentPackageStr;
     } else if (isSubscriberPackageId(dependentPackageStr)) {
       this.package2Id = dependentPackageStr;
-      this.versionNumber = versionNumberStr;
-      const versionWorking = versionNumberStr.toUpperCase().replace('-LATEST', '').replace('.LATEST', '');
-      const vers = versionWorking.split('.');
-      if (vers[0]) {
-        this.majorVersion = +vers[0];
-      }
-      if (vers[1]) {
-        this.minorVersion = +vers[1];
-      }
-      if (vers[2]) {
-        this.patchVersion = +vers[2];
-      }
-      if (vers[3]) {
-        this.buildVersion = +vers[3];
-      }
+      // this.versionNumber = versionNumberStr;
+      // const versionWorking = versionNumberStr.toUpperCase().replace('-LATEST', '').replace('.LATEST', '');
+      // const vers = versionWorking.split('.');
+      // if (vers[0]) {
+      //   this.majorVersion = +vers[0];
+      // }
+      // if (vers[1]) {
+      //   this.minorVersion = +vers[1];
+      // }
+      // if (vers[2]) {
+      //   this.patchVersion = +vers[2];
+      // }
+      // if (vers[3]) {
+      //   this.buildVersion = +vers[3];
+      // }
       if (versionNumberStr.toUpperCase().endsWith('LATEST')) {
         this.isLATESTSpecified = true;
       }

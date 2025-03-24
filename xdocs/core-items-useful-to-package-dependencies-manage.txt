@@ -43,3 +43,18 @@ packaging
  * projectJson.set('namespace', 'new');
  * await projectJson.write();
  * ```
+
+
+
+ OBJECT COMPARISON
+
+ v0.8.4                                 v1.0.0
+ ProjectPackageDirectoryDependency      PackageDirDependency
+    - subscriberPackageVersionId            - package
+    - package2Id                            - versionNumber?
+    - versionNumber                         - branch?
+    - majorVersion                          - 
+    - minorVersion                          - 
+    - patchVersion                          - 
+    - buildVersion                          - 
+    - isLATESTSpecified                     - 

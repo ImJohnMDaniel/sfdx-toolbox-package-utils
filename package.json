@@ -26,7 +26,7 @@
     "typescript": "^5.7.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": "^20.18.1"
   },
   "exports": "./lib/index.js",
   "files": [

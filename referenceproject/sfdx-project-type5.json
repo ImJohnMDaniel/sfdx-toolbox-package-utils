@@ -1,0 +1,66 @@
+{
+  "packageDirectories": [
+    {
+      "path": "sfdx-source/untracked",
+      "default": true,
+      "dependencies": [
+        {
+          "package": "referencePackageA@0.1.0.1"
+        },
+        {
+          "package": "referencePackageA",
+          "versionNumber": "0.LATEST"
+        },
+        {
+          "package": "x103.framework",
+          "versionNumber": "0.1.0-LATEST"
+        },
+        {
+          "package": "x103.framework-globals@0.1.0.1"
+        },
+        {
+          "package": "04t1T000000V9beQAC"
+        },
+        {
+          "package": "referencePackageA",
+          "versionNumber": "0.1-LATEST"
+        },
+        {
+          "package": "0Ho1T000000GmaTSAS",
+          "versionNumber": "0.1-LATEST"
+        },
+        {
+          "package": "0Ho1T000000GmaTSAS",
+          "versionNumber": "100.1-LATEST"
+        },
+        {
+          "package": "referencePackageA",
+          "versionNumber": "0.1.0.2"
+        }
+      ]
+    },
+    {
+      "path": "sfdx-source/untracked2",
+      "default": false
+    }
+  ],
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "62.0",
+  "packageAliases": {
+    "referencePackageA": "0Ho1T000000GmaOSAS",
+    "referencePackageB": "0Ho1T000000GmaTSAS",
+    "x103.framework": "0Ho1T000000XZAbSAO",
+    "x103.framework-globals": "0Ho1T000000XZAgSAO",
+    "referencePackageA@0.1.0.1": "04t1T000000asdOQAQ",
+    "referencePackageA@0.1.0.2": "04t1T000000asdYQAQ",
+    "referencePackageB@0.1.0.1": "04t1T000000asdTQAQ",
+    "x103.framework@0.1.0.1": "04t1T000000V9beQAC",
+    "x103.framework@0.1.0.2": "04t1T000000V9bjQAC",
+    "x103.framework@0.1.0.3": "04t1T000000V9boQAC",
+    "x103.framework@0.1.0.4": "04t1T000000V9btQAC",
+    "x103.framework-globals@0.1.0.1": "04t1T000000V9c3QAC",
+    "x103.framework-globals@0.1.0.2": "04t1T000000V9c8QAC",
+    "x103.framework-globals@0.1.0.3": "04t1T000000V9cDQAS"
+  }
+}
