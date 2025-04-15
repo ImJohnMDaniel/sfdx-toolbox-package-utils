@@ -35,7 +35,7 @@ export default class PackageVersionCleanup extends SfCommand<PackageVersionClean
       char: 's',
       required: true,
     }),
-    
+
     package: Flags.string({
       summary: messages.getMessage('flags.package.summary'),
       description: messages.getMessage('flags.package.description'),
@@ -43,13 +43,13 @@ export default class PackageVersionCleanup extends SfCommand<PackageVersionClean
       required: true,
     }),
 
-    'target-dev-hub': Flags.requiredHub()
+    'target-dev-hub': Flags.requiredHub(),
   };
 
   public async run(): Promise<PackageVersionCleanupResult[]> {
     const log = await Logger.child(this.ctor.name); // grab an instance to the logger
 
-    const { flags } = await this.parse(PackageVersionCleanup);  // setup the flags instance
+    const { flags } = await this.parse(PackageVersionCleanup); // setup the flags instance
 
     // Create a connection to the org
     await flags['target-dev-hub'].refreshAuth();
@@ -89,7 +89,7 @@ export default class PackageVersionCleanup extends SfCommand<PackageVersionClean
 
     this.spinner.start('Analyzing which package versions to delete...');
 
-    const packageVersions = await Package.listVersions(connection, project, packageVersionListOptions);
+    const packageVersions = await Package.listVersions(connection, this.project, packageVersionListOptions);
 
     const targetVersions = packageVersions.filter(
       (packageVersion) =>
@@ -147,20 +147,23 @@ export default class PackageVersionCleanup extends SfCommand<PackageVersionClean
   private displayDeletionResults(packageCleanupResults: PackageVersionCleanupResult[]): void {
     this.styledHeader('Package Version Cleanup Results');
     // columns: AllColumnProps to Column
-    this.table({data: packageCleanupResults, columns: [
-      {
-        key: 'SubscriberPackageVersionId',
-        name: 'PACKAGE VERSION ID'
-      },
-      {
-        key: 'Success',
-        name: 'SUCCESS'
-      },
-      {
-        key: 'Error',
-        name: 'ERROR'
-      }
-    ]});
+    this.table({
+      data: packageCleanupResults,
+      columns: [
+        {
+          key: 'SubscriberPackageVersionId',
+          name: 'PACKAGE VERSION ID',
+        },
+        {
+          key: 'Success',
+          name: 'SUCCESS',
+        },
+        {
+          key: 'Error',
+          name: 'ERROR',
+        },
+      ],
+    });
   }
 }
 

@@ -5,24 +5,23 @@
   "author": "John M. Daniel @ImJohnMDaniel",
   "bugs": "https://github.com/ImJohnMDaniel/sfdx-toolbox-package-utils/issues",
   "dependencies": {
-    "@oclif/core": "^4.2.10",
-    "@salesforce/core": "^8.8.7",
-    "@salesforce/sf-plugins-core": "^12.2.1",
-    "@salesforce/packaging": "^4.4.0",
+    "@oclif/core": "^4",
+    "@salesforce/core": "^8.2.7",
+    "@salesforce/sf-plugins-core": "^12",
+    "@salesforce/packaging": "^4.5.0",
     "@salesforce/ts-types": "^2.0.12",
     "@salesforce/schemas": "^1.9.0",
-    "@salesforce/kit": "^3.2.3",
-    "@types/sinon": "^17.0.4"
+    "@salesforce/kit": "^3.1.6"
   },
   "devDependencies": {
     "@oclif/plugin-command-snapshot": "^5.2.38",
     "@salesforce/cli-plugins-testkit": "^5.3.39",
-    "@salesforce/dev-scripts": "^10.2.12",
-    "@types/graceful-fs": "^4.1.9",
+    "@salesforce/dev-scripts": "^10",
+    "@salesforce/ts-sinon": "^1.4.19",
     "eslint-plugin-sf-plugin": "^1.20.18",
-    "oclif": "^4.17.42",
+    "oclif": "^4.17.43",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -81,6 +80,10 @@
     },
     "topicSeparator": " "
   },
+  "overrides": {
+    "minimatch": "5.1.2",
+    "glob": "8.1.0"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -91,6 +94,7 @@
     "clean-all": "sf-clean all",
     "compile": "wireit",
     "docs": "sf-docs",
+    "fix-license": "eslint src test --fix --rule \"header/header: [2]\"",
     "format": "wireit",
     "link-check": "wireit",
     "lint": "wireit",
@@ -205,7 +209,7 @@
       "output": []
     },
     "link-check": {
-      "command": "node -e \"process.exit(process.env.CI ? 0 : 1)\" || linkinator \"**/*.md\" --skip \"CHANGELOG.md|node_modules|test/|confluence.internal.salesforce.com|my.salesforce.com|%s\" --markdown --retry --directory-listing --verbosity error",
+      "command": "node -e \"process.exit(process.env.CI ? 0 : 1)\" || linkinator \"**/*.md\" --skip \"CHANGELOG.md|node_modules|test/|confluence.internal.salesforce.com|my.salesforce.com|localhost|%s\" --markdown --retry --directory-listing --verbosity error",
       "files": [
         "./*.md",
         "./!(CHANGELOG).md",
